@@ -1,25 +1,12 @@
-/*
-filedrag.js - HTML5 File Drag & Drop demonstration
-Featured on SitePoint.com
-Developed by Craig Buckler (@craigbuckler) of OptimalWorks.net
-*/
 (function() {
-
-	// getElementById
-	function $id(id) {
-		return document.getElementById(id);
-	}
-
-
-	// output information
 	function Output(msg) {
-		var m = $id("messages");
+		var m = document.getElementById("messages");
 		m.innerHTML = msg + m.innerHTML;
 	}
 
 
 	// file drag hover
-	function FileDragHover(e) {
+	function eventhandler_mousehover_dragging_file(e) {
 		e.stopPropagation();
 		e.preventDefault();
 		e.target.className = (e.type == "dragover" ? "hover" : "");
@@ -27,7 +14,9 @@ Developed by Craig Buckler (@craigbuckler) of OptimalWorks.net
 
 
 	// file selection
-	function FileSelectHandler(e) {
+	function eventhandler_mousedrop_fileselected(e) {
+		console.log("FileSelectHandler");
+		console.log(e);
 
 		// cancel event and hover styling
 		FileDragHover(e);
@@ -45,6 +34,9 @@ Developed by Craig Buckler (@craigbuckler) of OptimalWorks.net
 
 	// output file information
 	function ParseFile(file) {
+		console.log(file);
+
+		console.log(window.URL.createObjectURL(file));
 
 		Output(
 			"<p>File information: <strong>" + file.name +
@@ -52,41 +44,34 @@ Developed by Craig Buckler (@craigbuckler) of OptimalWorks.net
 			"</strong> size: <strong>" + file.size +
 			"</strong> bytes</p>"
 		);
-
 	}
 
 
 	// initialize
 	function Init() {
-        console.log("test");
+		var fileselect = document.getElementById("fileselect");
+		var filedrag = document.getElementById("filedrag");
+		var submitbutton = document.getElementById("submitbutton");
 
-		var fileselect = $id("fileselect"),
-			filedrag = $id("filedrag"),
-			submitbutton = $id("submitbutton");
+		// File selected.
+		fileselect.addEventListener("change", eventhandler_mousedrop_fileselected, false);
 
-		// file select
-		fileselect.addEventListener("change", FileSelectHandler, false);
-
-		// is XHR2 available?
-		var xhr = new XMLHttpRequest();
-		if (xhr.upload) {
-
-			// file drop
-			filedrag.addEventListener("dragover", FileDragHover, false);
-			filedrag.addEventListener("dragleave", FileDragHover, false);
-			filedrag.addEventListener("drop", FileSelectHandler, false);
+		// XHR2 available
+		if((new XMLHttpRequest()).upload){
+			// File drop handlers
+			filedrag.addEventListener("dragover", eventhandler_mousehover_dragging_file, false);	// Mouse inside it
+			filedrag.addEventListener("dragleave", eventhandler_mousehover_dragging_file, false);	// Mouse outside it
+			filedrag.addEventListener("drop", eventhandler_mousedrop_fileselected, false);	// File dropped
 			filedrag.style.display = "block";
 
-			// remove submit button
+			// Remove submit button.
 			submitbutton.style.display = "none";
 		}
 
 	}
 
-	// call initialization file
+	// If file management is allowed on the browser
 	if (window.File && window.FileList && window.FileReader) {
 		Init();
 	}
-
-
 })();

@@ -9,18 +9,20 @@ if(typeof(JSLoader)=='undefined'){
         var compose_src = function(src){return (_js_folder!=null) ? _js_folder+src : src;}
         var isLoaded = function(src){return (_js_loaded.indexOf(compose_src(src)) > -1);}
 
-        var load_script = function(src, callback=undefined){
+        var load_script = function(src, callback){
             var script = document.createElement("script");
             if(callback) script.onload = callback;
             script.src = compose_src(src);
             document.head.appendChild(script);
         }
 
-        var load = function(src, callback=undefined){
+        var load = function(src, callback){
+            if(!callback) callback=false;
             if(!isLoaded(src)) load_script(src, callback);
         }
 
-        var load_once = function(src, callback=undefined){
+        var load_once = function(src, callback){
+            if(!callback) callback=false;
             if(!isLoaded(src)){
                 load_script(src, callback);
                 _js_loaded.push(compose_src(src));

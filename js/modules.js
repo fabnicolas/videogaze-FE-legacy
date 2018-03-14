@@ -1,5 +1,5 @@
 var Utils = (function(undefined){
-    var loadHTML = function(url, callback=undefined){
+    var loadHTML = function(url, callback){
         var request = new XMLHttpRequest();
         request.open('GET', url, true);
         request.onload = function() {

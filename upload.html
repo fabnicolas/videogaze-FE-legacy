@@ -1,0 +1,32 @@
+<div>
+    <form id="upload" action="index.html" method="POST" enctype="multipart/form-data">
+
+        <fieldset>
+            <legend>HTML File Upload</legend>
+
+            <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
+
+            <div>
+                <label for="fileselect">Files to upload:</label>
+                <input type="file" id="fileselect" name="fileselect[]" multiple="multiple" />
+                <div id="filedrag">or<br/><br/><br/><br/><br/><br/><br/><br/> drop files here</div>
+            </div>
+
+            <div id="submitbutton">
+                <button type="submit">Upload Files</button>
+            </div>
+
+        </fieldset>
+
+    </form>
+</div>
+
+
+<div id="messages">
+    <p>Status Messages</p>
+</div>
+
+<script type="text/javascript">
+    console.log("success");
+    JSLoader.load_once("upload.js");
+</script>

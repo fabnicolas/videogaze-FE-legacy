@@ -2,26 +2,29 @@
     <fieldset>
         <legend>HTML File Upload</legend>
 
-        <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
+            <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
 
-        <div id="file_selector">
-            <label for="fileselect">Files to upload:</label>
-            <input type="file" id="fileselect" name="fileselect[]" />
-            <div id="filedrag">or drop files here</div>
-        </div>
+            <div id="file_selector">
+                <label for="fileselect">Files to upload:</label>
+                <input type="file" id="fileselect" name="fileselect[]" />
+                <div id="filedrag">or drop files here</div>
+            </div>
 
-        <div id="submitbutton">
-            <button type="submit">Upload Files</button>
-        </div>
+            <div id="submitbutton">
+                <button type="submit">Upload Files</button>
+            </div>
+
+            
+            <div id="upload-done" class="container">
+                <div class="left"><video muted id="video-preview"></video></div>
+                <div class="right" id="messages"></div>
+            </div>
+    </div>
 
     </fieldset>
 
 </form>
 
-<video muted id="video-preview"></video>
-<div id="messages">
-    <p>Status Messages</p>
-</div>
 
 <script type="text/javascript">
     JSLoader.load("upload.js");

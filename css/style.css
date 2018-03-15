@@ -4,6 +4,14 @@
     box-sizing: border-box;
 }
 
+html, body{
+  height: 100%;
+}
+
+footer{
+  box-sizing: border-box;
+}
+
 body{
     background-color: black;
     color: whitesmoke;
@@ -27,6 +35,20 @@ footer{
 }
 
 /* TEST UPLOAD */
+#upload{
+  height: 70%;
+}
+
+#upload fieldset, #upload #file_selector, #upload #filedrag{
+  height: 100%;
+  box-sizing: border-box;
+}
+
+#upload #filedrag{
+  height: 80%;
+  box-sizing: border-box;
+}
+
 #upload legend{
 	font-weight: bold;
 	color: #333;

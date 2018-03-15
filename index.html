@@ -23,21 +23,21 @@
         
     </footer>
     <div id="inject_js"></div>
-<script type="text/javascript" src="./js/JSLoader.js"></script>
-<script type="text/javascript">
-    JSLoader.setFolder("js/");
-    JSLoader.load_once("modules.js", function(){
-        setPage("main.html");
-    });
-
-    function setPage(html_page){
-        Utils.loadHTML(html_page, function(status, text){
-            console.log(html_page);
-            if(status==true){
-                Utils.parseHTMLwJS(text, document.getElementById("app"), document.getElementById('inject_js'));
-            }
+    <script type="text/javascript" src="./js/JSLoader.js"></script>
+    <script type="text/javascript">
+        JSLoader.setFolder("js/");
+        JSLoader.load_once("modules.js", function(){
+          setPage("main.html");
         });
-    }
-</script>
+
+        function setPage(html_page){
+            Utils.loadHTML(html_page, function(status, text){
+                console.log(html_page);
+                if(status==true){
+                    Utils.parseHTMLwJS(text, document.getElementById("app"), document.getElementById('inject_js'));
+                }
+            });
+        }
+    </script>
 </body>
 </html>

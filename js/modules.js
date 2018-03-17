@@ -16,14 +16,14 @@ var Utils = (function(undefined){
       node.innerHTML = text;
     }
 
-    var parseHTMLwJS = function(text, node, destination){
-      parseHTML(text, node);
-      injectJSFromDOM(node, destination);
+    var parseHTMLwJS = function(text, node_html, node_js){
+      parseHTML(text, node_html);
+      injectJSFromDOM(node_html, node_js);
     }
 
-    var injectJSFromDOM = function(node, destination){
+    var injectJSFromDOM = function(node_html, destination){
       clearNodeChilds(destination);
-      var scripts = node.getElementsByTagName("script");
+      var scripts = node_html.getElementsByTagName("script");
       for(var i=0;i<scripts.length;i++){
         if(scripts[i].src) injectJSSrc(scripts[i].src, destination);
         else               injectJSCode(scripts[i].innerHTML, destination);

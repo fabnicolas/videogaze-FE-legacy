@@ -9,13 +9,17 @@ html, body{
 	width: 100%;
 }
 
-header, #app{
+#spa-top, #spa-app{
 	text-align: center;
 }
 
-#app{
+#spa-app{
 	box-sizing: border-box;
 	background-color: rgba(0,0,0,0.5);
+}
+
+#spa-vars{
+	display:none;
 }
 
 .vbox{
@@ -53,54 +57,7 @@ body{
     transform: translate3d(0,0,0);
 }
 
-.background-layer:before {
-    content: "";
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	background: inherit;
-	-webkit-transform: translateZ(0);
-	transform: translateZ(0);
-	z-index: -1;
-	animation: bodyblur_pageopened 1s normal, 1s bodyblur 5s infinite;
 
-}
-
-@keyframes bodyblur_pageopened {
-	0%   {
-		filter        : blur(100px);
-		-moz-filter   : blur(100px);
-		-webkit-filter: blur(100px);
-		-o-filter     : blur(100px);
-	}
-	100% { 
-		filter        : blur(0.5px);
-		-moz-filter   : blur(0.5px);
-		-webkit-filter: blur(0.5px);
-		-o-filter     : blur(0.5px);
-	}
-}
-
-@keyframes bodyblur {
-	0%   {
-		filter        : blur(1.5px);
-		-moz-filter   : blur(1.5px);
-		-webkit-filter: blur(1.5px);
-		-o-filter     : blur(1.5px);
-	}
-	50% { 
-		filter        : blur(0.5px);
-		-moz-filter   : blur(0.5px);
-		-webkit-filter: blur(0.5px);
-		-o-filter     : blur(0.5px);
-	}
-	100%   {
-		filter        : blur(1.5px);
-		-moz-filter   : blur(1.5px);
-		-webkit-filter: blur(1.5px);
-		-o-filter     : blur(1.5px);
-	}
-}
 
 body a{
     color: #CD00CD;
@@ -110,9 +67,12 @@ body a:active{
     color: orangered;
 }
 
-.text-based-content{
-	padding-top: 10%;
+.content{
 	height: 100%;
+}
+
+.text-top-space{
+	padding-top: 10%;
 }
 
 /* TEST UPLOAD */
@@ -216,6 +176,55 @@ body a:active{
 	#upload-done .left{
 		float: left;
 		max-width: 70%;
+	}
+
+	.background-layer:before {
+		content: "";
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		background: inherit;
+		-webkit-transform: translateZ(0);
+		transform: translateZ(0);
+		z-index: -1;
+		animation: bodyblur_pageopened 1s normal, 1s bodyblur 5s infinite;
+	
+	}
+	
+	@keyframes bodyblur_pageopened {
+		0%   {
+			filter        : blur(100px);
+			-moz-filter   : blur(100px);
+			-webkit-filter: blur(100px);
+			-o-filter     : blur(100px);
+		}
+		100% { 
+			filter        : blur(0.5px);
+			-moz-filter   : blur(0.5px);
+			-webkit-filter: blur(0.5px);
+			-o-filter     : blur(0.5px);
+		}
+	}
+	
+	@keyframes bodyblur {
+		0%   {
+			filter        : blur(1.5px);
+			-moz-filter   : blur(1.5px);
+			-webkit-filter: blur(1.5px);
+			-o-filter     : blur(1.5px);
+		}
+		50% { 
+			filter        : blur(0.5px);
+			-moz-filter   : blur(0.5px);
+			-webkit-filter: blur(0.5px);
+			-o-filter     : blur(0.5px);
+		}
+		100%   {
+			filter        : blur(1.5px);
+			-moz-filter   : blur(1.5px);
+			-webkit-filter: blur(1.5px);
+			-o-filter     : blur(1.5px);
+		}
 	}
 }
 @media (min-width:1025px) { /* big landscape tablets, laptops, and desktops */ }

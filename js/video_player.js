@@ -1,8 +1,7 @@
 var VideoJSPlayer = (function(){
     var is_initialized=false;
 
-    var init = function(){
-        return true;//Hack
+    var init = function(callback=null){
         if(is_initialized===false){
             var link_videojs_css=document.createElement('link');
             link_videojs_css.href='http://vjs.zencdn.net/6.6.3/video-js.css';
@@ -12,13 +11,18 @@ var VideoJSPlayer = (function(){
             var script_videojs_js=document.createElement('script');
             script_videojs_js.src='http://vjs.zencdn.net/ie8/1.1.2/videojs-ie8.min.js';
             document.getElementsByTagName('head')[0].appendChild(script_videojs_js);
+
+            var script = document.createElement("script");
+            script.src = "http://vjs.zencdn.net/6.6.3/video.js";
+            if(callback!=null) script.onload=callback;
+            document.body.appendChild(script);
             is_initialized=true;
         }
     }
 
     //<!--<source src="MY_VIDEO.webm" type='video/webm'>--> h->poster="progress.png"
-    var get_video_player = function(filename){
-        var body_data = '<video id="my-video" style="width:100%;height:100%;" class="video-js" controls preload="auto"'
+    var inject_video_player = function(node,player_id='my_video',filename,extra_video_elements='',callback=null){
+        var body_data = '<video id="'+player_id+'" style="width:100%;height:100%;" class="video-js" controls '+extra_video_elements+' preload="auto"'
         +'\n width="640" height="264" data-setup="{}">'
         +'\n<source src="http://thedarkgates.rf.gd/videogaze-BE/stream_mp4.php?filename='+filename+'"'
         +' type=\'video/mp4\'>'
@@ -27,16 +31,12 @@ var VideoJSPlayer = (function(){
         +    '\n<a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>'
         +  '\n</p>'
         +'\n</video>';
-
-        var script = document.createElement("script");
-        script.src = "http://vjs.zencdn.net/6.6.3/video.js";
-        document.body.appendChild(script);
-
-        return body_data;
+        node.innerHTML = body_data;
+        if(callback!=null) callback();
     }
 
     return {
         init: init,
-        get_video_player: get_video_player
+        inject_video_player: inject_video_player
     }
 })();

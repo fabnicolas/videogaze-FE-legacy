@@ -19,6 +19,11 @@ var Utils = (function(undefined){
     var parseHTMLwJS = function(text, node_html, node_js){
       parseHTML(text, node_html);
       injectJSFromDOM(node_html, node_js);
+      injectHEAD(node_html);
+    }
+
+    var injectHEAD = function(node_html){
+      
     }
 
     var injectJSFromDOM = function(node_html, destination){

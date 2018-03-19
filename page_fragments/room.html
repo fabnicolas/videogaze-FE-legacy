@@ -1,0 +1,28 @@
+<head>
+    <link href="http://vjs.zencdn.net/6.6.3/video-js.css" rel="stylesheet">
+  
+    <!-- If you'd like to support IE8 -->
+    <script src="http://vjs.zencdn.net/ie8/1.1.2/videojs-ie8.min.js"></script>
+</head>
+
+<div class="content" id="video_player_container">
+</div>
+
+<script type="text/javascript">
+    JSLoader.load("room.js",function(){
+        JSLoader.load("video_player.js",function(){
+            var roomcode=document.getElementById("spa-var--roomcode").innerHTML;
+            Room.init(roomcode,function(response){
+                if(response.status==1){
+                    VideoJSPlayer.init();
+                    if(response.message.hasOwnProperty("roomcode")) roomcode = response.message.roomcode;
+                    document.getElementById("spa-var--roomcode").innerHTML = roomcode;
+                    window.history.replaceState({} , 'VideoGaze', './index.php?roomcode='+roomcode);
+                    document.getElementById("spa-var--video_to_play").innerHTML = response.message.stream_key;
+                    var video_to_play=document.getElementById("spa-var--video_to_play").innerHTML;
+                    document.getElementById("video_player_container").innerHTML = VideoJSPlayer.get_video_player(video_to_play);
+                }
+            });
+        });
+    });
+</script>

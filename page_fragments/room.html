@@ -14,7 +14,6 @@
             var roomcode=document.getElementById("spa-var--roomcode").innerHTML;
             Room.init(roomcode,function(response){
                 if(response.status==1){
-                    if(!response.message.hasOwnProperty("roomcode")) response.message.roomcode = roomcode;
                     set_room_content(response.message);
                 }
             });

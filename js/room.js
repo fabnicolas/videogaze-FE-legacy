@@ -58,9 +58,22 @@ var Room = (function(){
         RoomHTTPEvents.init(roomcode,function(response){
             if(response.status==1){
                 _roomdata = response.message;
+                if(!response.message.hasOwnProperty("roomcode")) _roomdata.roomcode = roomcode;
             }
             if(callback!=null) callback(response);
         });
+    }
+
+    var set_stream=function(stream_type,stream_key){
+        RoomHTTPEvents.request(_roomdata.roomcode,'set_stream',stream_type+";key="+stream_key);
+    }
+
+    var set_isplaying=function(isplaying){
+        RoomHTTPEvents.request(_roomdata.roomcode,'set_isplaying',(isplaying==true?1:0));
+    }
+
+    var set_current_time=function(current_time){
+        RoomHTTPEvents.request(_roomdata.roomcode,'set_current_time',current_time);
     }
 
     var attach_videojs_handler=function(video_player_id){

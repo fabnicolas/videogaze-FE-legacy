@@ -24,38 +24,26 @@
     <div class="vbox background-layer">
     <header id="spa-top" class="vbox-top">
         <h1>VideoGaze</h1>
-        <a onclick="setPage('start.html')" href="#">#START</a>
-        <a onclick="setPage('second.html')" href="#">#SECOND</a>
-        <a onclick="setPage('lorem.html')" href="#">#LOREM_IPSUM</a>
-        <a onclick="setPage('room.html')" href="#">#ROOM</a>
+        <a onclick="SPA.setPage('start.html')" href="#">#START</a>
+        <a onclick="SPA.setPage('second.html')" href="#">#SECOND</a>
+        <a onclick="SPA.setPage('lorem.html')" href="#">#LOREM_IPSUM</a>
+        <a onclick="SPA.setPage('room.html')" href="#">#ROOM</a>
     </header>
     <footer id="spa-app" class="vbox-bottom"></footer>
-    <div id="spa-js"></div>
-    <div id="spa-vars">
-        <div id="spa-var--video_to_play"><?php echo ($video_source!=null)?$video_source:'sample.mp4';?></div>
-        <div id="spa-var--roomcode"><?php echo $roomcode;?></div>
-    </div>
     <script type="text/javascript" src="./js/JSLoader.js"></script>
     <script type="text/javascript">
         JSLoader.setFolder("js/");
-        JSLoader.load_once("utils.js", function(){
-            <?php
-            if($video_source!=null) echo "setPage('video.html');";
-            elseif($roomcode!=null) echo "setPage('room.html');";
-            else                    echo "setPage('start.html');";
-            ?>
-        });
-
-        function setPage(html_page){
-            Utils.loadHTML('./page_fragments/'+html_page, function(status, text){
-                if(status==true){
-                    Utils.parseHTMLwJS(text,
-                        document.getElementById("spa-app"),
-                        document.getElementById("spa-js")
-                    );
-                }
+        JSLoader.load_once("SPA.js", function(){
+            SPA.init('./page_fragments/',function(){
+                SPA.setVar('video_to_play','<?php echo ($video_source!=null)?$video_source:'sample.mp4';?>');
+                SPA.setVar('roomcode','<?php echo $roomcode;?>');
+                <?php
+                if($video_source!=null) echo "SPA.setPage('video.html');";
+                elseif($roomcode!=null) echo "SPA.setPage('room.html');";
+                else                    echo "SPA.setPage('start.html');";
+                ?>
             });
-        }
+        });
     </script>
     </div>
 </body>

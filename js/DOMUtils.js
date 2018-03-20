@@ -1,4 +1,4 @@
-var Utils = (function(undefined){
+var DOMUtils = (function(undefined){
     var loadHTML = function(url, callback){
         var request = new XMLHttpRequest();
         request.open('GET', url, true);
@@ -12,12 +12,12 @@ var Utils = (function(undefined){
         request.send();
     }
 
-    var parseHTML = function(text, node){
+    var injectHTML = function(text, node){
       node.innerHTML = text;
     }
 
-    var parseHTMLwJS = function(text, node_html, node_js){
-      parseHTML(text, node_html);
+    var injectHTMLwJS = function(text, node_html, node_js){
+      injectHTML(text, node_html);
       injectJSFromDOM(node_html, node_js);
       injectHEAD(node_html);
     }
@@ -58,7 +58,7 @@ var Utils = (function(undefined){
     return {
         loadHTML: loadHTML,
         injectJSFromDOM: injectJSFromDOM,
-        parseHTML: parseHTML,
-        parseHTMLwJS: parseHTMLwJS
+        injectHTML: injectHTML,
+        injectHTMLwJS: injectHTMLwJS
     }
 })();

@@ -11,12 +11,10 @@
 <script type="text/javascript">
     JSLoader.load("video_player.js",function(){
         VideoJSPlayer.init(function(){
-            var video_to_play = document.getElementById("spa-var--video_to_play").innerHTML;
-            console.log("Video="+video_to_play);
             VideoJSPlayer.inject_video_player(
                 document.getElementById("video_player_container"),
                 'my_video',
-                video_to_play,
+                document.getElementById("spa-var--video_to_play").innerHTML,
                 'autoplay'
             );
         });

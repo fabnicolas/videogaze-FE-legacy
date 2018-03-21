@@ -30,7 +30,7 @@
                 document.getElementById("video_player_container"),
                 "my_video",
                 video_to_play,
-                (room_data.stream_isplaying==1 ? "autoplay": ""),
+                '',
                 function(){
                     Room.attach_videojs_handler("my_video");
                 }

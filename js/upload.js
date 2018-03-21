@@ -35,7 +35,7 @@ var ChunkUploader = (function() {
         fd.append("max_chunks",max_chunks);
 
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', 'http://thedarkgates.rf.gd/videogaze-BE/compose_chunks.php');
+        xhr.open('POST', window.backend_url+'compose_chunks.php');
         xhr.onloadend = function(e) {
             if(xhr.status!=200){
                 logger_uploadjs("FAILED to compose chunk #"+chunk_number+". Status = "+xhr.status+".");
@@ -59,7 +59,9 @@ var ChunkUploader = (function() {
         xhr.send(fd);
     }
 
-    var uploadFile = function(file,callback=null) {
+    var uploadFile = function(file,callback) {
+        if(callback===undefined) callback=null;
+
         if(callback!=null) callback_finish_upload=callback;
         var BYTES_PER_CHUNK, SIZE, NUM_CHUNKS, start, end;
         BYTES_PER_CHUNK = parseInt(1048576, 10);
@@ -82,7 +84,10 @@ var ChunkUploader = (function() {
     }
 
     var chunks_uploaded=0;
-    var uploadChunk = function(chunkFile, key, chunk_number, max_chunks, callback_enduploadchunks=null, call_again=true) {
+    var uploadChunk = function(chunkFile, key, chunk_number, max_chunks, callback_enduploadchunks, call_again) {
+        if(callback_enduploadchunks===undefined) callback_enduploadchunks=null;
+        if(call_again===undefined) call_again=true;
+
 		var fd = new FormData();
 		fd.append("chunk_file",chunkFile);
 		fd.append("key",key);
@@ -92,7 +97,7 @@ var ChunkUploader = (function() {
         logger_uploadjs("Sending chunk temporary file: "+key+"_part"+chunk_number+".tmp...");
         //logger_uploadjs(chunkFile);
         var xhr = new XMLHttpRequest();
-		xhr.open('POST', 'http://thedarkgates.rf.gd/videogaze-BE/handler_chunks.php', true);
+		xhr.open('POST', window.backend_url+'handler_chunks.php', true);
         xhr.upload.onprogress = function(e) {
             if(e.lengthComputable) {
                 var perc = Math.round((e.loaded / e.total) * 100);
@@ -198,8 +203,8 @@ var ChunkUploader = (function() {
         //logger_uploadjs(file);
         ChunkUploader.uploadFile(file,function(filename){
             logger_uploadjs("Setting..."+filename);
-            document.getElementById("spa-var--video_to_play").innerHTML=filename;
-            setPage("video.html");
+            SPA.setVar("video_to_play",filename);
+            SPA.setPage("video.html");
             window.history.replaceState({} , 'VideoGaze', './video/'+filename);
             logger_uploadjs("Setting completed.");
         });
@@ -213,7 +218,7 @@ var ChunkUploader = (function() {
         var fd = new FormData();
         fd.append("afile", file);
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', 'http://thedarkgates.rf.gd/videogaze-BE/handle_file_upload.php', true);
+        xhr.open('POST', window.backend_url+'handle_file_upload.php', true);
         xhr.timeout = 60000;
         xhr.ontimeout = function() {
             alert("Timed out!!!");

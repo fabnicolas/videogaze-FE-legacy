@@ -4,9 +4,9 @@ var DOMUtils = (function(undefined){
         request.open('GET', url, true);
         request.onload = function() {
           if(request.status >= 200 && request.status < 400){
-            if(callback) callback(true, request.responseText);
+            if(callback!=null) callback(true, request.responseText);
           }else{
-            if(callback) callback(false, undefined);
+            if(callback!=null) callback(false, undefined);
           }
         };
         request.send();

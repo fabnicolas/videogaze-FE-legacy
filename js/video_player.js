@@ -1,7 +1,9 @@
 var VideoJSPlayer = (function(){
     var is_initialized=false;
 
-    var init = function(callback=null){
+    var init = function(callback){
+        if(callback===undefined) callback=null;
+
         if(is_initialized===false){
             var link_videojs_css=document.createElement('link');
             link_videojs_css.href='http://vjs.zencdn.net/6.6.3/video-js.css';
@@ -21,10 +23,14 @@ var VideoJSPlayer = (function(){
     }
 
     //<!--<source src="MY_VIDEO.webm" type='video/webm'>--> h->poster="progress.png"
-    var inject_video_player = function(node,player_id='my_video',filename,extra_video_elements='',callback=null){
+    var inject_video_player = function(node,player_id,filename,extra_video_elements,callback){
+        if(player_id===undefined) player_id='my_video';
+        if(extra_video_elements===undefined) extra_video_elements='';
+        if(callback===undefined) callback=null;
+        
         var body_data = '<video id="'+player_id+'" style="width:100%;height:100%;" class="video-js" controls '+extra_video_elements+' preload="auto"'
         +'\n width="640" height="264" data-setup="{}">'
-        +'\n<source src="http://thedarkgates.rf.gd/videogaze-BE/stream_mp4.php?filename='+filename+'"'
+        +'\n<source src="'+(window.backend_url)+'stream_mp4.php?filename='+filename+'"'
         +' type=\'video/mp4\'>'
         +  '\n<p class="vjs-no-js">'
         +    '\nTo view this video please enable JavaScript, and consider upgrading to a web browser that'

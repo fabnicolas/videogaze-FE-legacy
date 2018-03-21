@@ -9,8 +9,7 @@
 <html>
 
 <head>
-    
-    <base href="http://thedarkgates.rf.gd/videogaze/"/> 
+    <base href="http://localhost:8081/videogaze/"/> 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <meta name="description" content="VideoGaze - Watch videos with friends and lovers together!">
@@ -32,6 +31,9 @@
     <footer id="spa-app" class="vbox-bottom"></footer>
     <script type="text/javascript" src="./js/JSLoader.js"></script>
     <script type="text/javascript">
+        window.frontend_url = (document.getElementsByTagName("base")[0]).href;
+        window.backend_url = 'http://localhost:8081/videogaze-BE/';
+
         JSLoader.setFolder("js/");
         JSLoader.load_once("SPA.js", function(){
             SPA.init('./page_fragments/',function(){

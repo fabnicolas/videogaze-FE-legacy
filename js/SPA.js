@@ -8,7 +8,9 @@ var SPA = (function(undefined){
     var _div_spajs;
     var _div_spavars;
 
-    var init=function(page_fragments_folder=null, callback=null){
+    var init=function(page_fragments_folder, callback){
+        if(page_fragments_folder===undefined) page_fragments_folder=null;
+        if(callback===undefined) callback=null;
         // Require DOMUtils 
         JSLoader.load_once("DOMUtils.js",function(){
             if(_initialized==false){

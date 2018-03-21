@@ -12,19 +12,21 @@ var JSLoader = (function(undefined){
 
     var load_script = function(src, callback){
         var script = document.createElement("script");
-        if(callback) script.onload = callback;
+        if(callback!=null) script.onload = callback;
         script.src = compose_src(src);
         document.head.appendChild(script);
     }
 
     var load = function(src, callback){
-        if(!callback) callback=false;
+        if(callback===undefined) callback=null;
+
         if(!isLoaded(src)) load_script(src, callback);
         else               callback();
     }
 
     var load_once = function(src, callback){
-        if(!callback) callback=false;
+        if(callback===undefined) callback=null;
+
         if(!isLoaded(src)){
             load_script(src, callback);
             _js_loaded.push(compose_src(src));

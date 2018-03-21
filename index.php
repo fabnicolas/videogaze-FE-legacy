@@ -27,23 +27,26 @@
     <meta name="author" content="fabnicolas">
     <title>VideoGaze - Watch videos with friends and lovers together!</title>
     <link rel="stylesheet" href="./css/style.css">
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 </head>
 
 <body>
-    <div class="vbox background-layer">
+    <div id="bglayer" class="vbox background-layer"><!-- background-layer">-->
     <header id="spa-top" class="vbox-top">
-        <h1>VideoGaze</h1>
-        <a onclick="SPA.setPage('start.html')" href="#">#START</a>
-        <a onclick="SPA.setPage('second.html')" href="#">#SECOND</a>
-        <a onclick="SPA.setPage('lorem.html')" href="#">#LOREM_IPSUM</a>
+        <div id="folding-header" class="folding-div">
+            <a onclick="SPA.setPage('start.html')" class="title"><h1>VideoGaze</h1></a>
+            <a onclick="SPA.setPage('start.html')" href="#">#START</a>
+            <a onclick="SPA.setPage('second.html')" href="#">#SECOND</a>
+            <a onclick="SPA.setPage('lorem.html')" href="#">#LOREM_IPSUM</a>
+        </div>
+        <div id="custom-controls" onclick="toggle_header.toggle_animation()">Test</div>
     </header>
     <footer id="spa-app" class="vbox-bottom"></footer>
-    <script type="text/javascript" src="./js/JSLoader.js"></script>
-    <script type="text/javascript">
+    <script src="./js/JSLoader.js"></script>
+    <script>
         window.frontend_url = (document.getElementsByTagName("base")[0]).href;
         window.backend_url = window.frontend_url+'../videogaze-BE/';
 
+        var toggle_header;
         JSLoader.setFolder("js/");
         JSLoader.load_once("SPA.js", function(){
             SPA.init('./page_fragments/',function(){
@@ -54,6 +57,15 @@
                 elseif($roomcode!=null) echo "SPA.setPage('room.html');";
                 else                    echo "SPA.setPage('start.html');";
                 ?>
+
+                JSLoader.load("CollapseElement.js", function(){
+                    toggle_header = CollapseElement('folding-header');
+                });
+                JSLoader.load("ImageLoader.js", function(){
+                    ImageLoader.loadBackgroundImage("./images/dbs.webp");
+                    DOMUtils.toggleClass(document.getElementById("bglayer"), "background-layer");
+                });
+                DOMUtils.loadCSS("./css/roboto.css");
             });
         });
     </script>

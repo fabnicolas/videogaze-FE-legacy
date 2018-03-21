@@ -1,7 +1,9 @@
+/* CSS reset */
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
+	box-sizing: border-box;
+	position: relative;
 }
 
 html, body{
@@ -9,8 +11,13 @@ html, body{
 	width: 100%;
 }
 
+/* SPA */
 #spa-top, #spa-app{
 	text-align: center;
+}
+
+#spa-top{
+	background-color: rgba(0,0,0,0.8);
 }
 
 #spa-app{
@@ -19,9 +26,10 @@ html, body{
 }
 
 #spa-vars{
-	display:none;
+	display: none;
 }
 
+/* Vertical Box for SPA and subcomponents to get page height 100% */
 .vbox{
 	height: 100%;
 	width: 100%;
@@ -37,16 +45,18 @@ html, body{
     display: table-row;
 }
 
+/* Body and background */
 body{
     background-color: black;
     color: whitesmoke;
 	font-family: 'Roboto', sans-serif;
+	background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .background-layer{
 	background-image: url('../images/background-720p.jpg');
-	background-repeat: no-repeat;
-	background-size: cover;
 	-webkit-font-smoothing:antialiased;
 	-webkit-backface-visibility: hidden;
 	-moz-backface-visibility: hidden;
@@ -67,6 +77,10 @@ body a:active{
     color: orangered;
 }
 
+.title{color:whitesmoke;}
+.title:visited{color:whitesmoke;}
+
+/* Content section */
 .content{
 	height: 100%;
 }
@@ -75,7 +89,7 @@ body a:active{
 	padding-top: 10%;
 }
 
-/* TEST UPLOAD */
+/* Upload */
 #upload{
 	height: 100%;
 }

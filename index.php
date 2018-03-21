@@ -1,10 +1,13 @@
 <?php
-    function base_url(){
+    $config = include(__DIR__.'/config.php');
+    $frontend_dir=$config['frontend_subfolder'];
+
+    function base_url($frontend_dir=null){
         return sprintf(
-            "%s://%s%s",
+            "%s://%s/%s",
             isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
             $_SERVER['SERVER_NAME'],
-            $_SERVER['REQUEST_URI']
+            ($frontend_dir!=null?$frontend_dir.'/':'')
         );
     }
     function get_parameter($param,$default_value=null){
@@ -17,7 +20,7 @@
 <html>
 
 <head>
-    <base href="<?php echo base_url(); ?>"/> 
+    <base href="<?php echo base_url($frontend_dir); ?>"/> 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <meta name="description" content="VideoGaze - Watch videos with friends and lovers together!">
@@ -34,7 +37,6 @@
         <a onclick="SPA.setPage('start.html')" href="#">#START</a>
         <a onclick="SPA.setPage('second.html')" href="#">#SECOND</a>
         <a onclick="SPA.setPage('lorem.html')" href="#">#LOREM_IPSUM</a>
-        <a onclick="SPA.setPage('room.html')" href="#">#ROOM</a>
     </header>
     <footer id="spa-app" class="vbox-bottom"></footer>
     <script type="text/javascript" src="./js/JSLoader.js"></script>

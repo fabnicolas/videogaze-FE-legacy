@@ -1,4 +1,12 @@
 <?php
+    function base_url(){
+        return sprintf(
+            "%s://%s%s",
+            isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
+            $_SERVER['SERVER_NAME'],
+            $_SERVER['REQUEST_URI']
+        );
+    }
     function get_parameter($param,$default_value=null){
         return (isset($_GET[$param])?$_GET[$param]:$default_value);
     }
@@ -9,7 +17,7 @@
 <html>
 
 <head>
-    <base href="http://localhost:8081/videogaze/"/> 
+    <base href="<?php echo base_url(); ?>"/> 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <meta name="description" content="VideoGaze - Watch videos with friends and lovers together!">
@@ -32,7 +40,7 @@
     <script type="text/javascript" src="./js/JSLoader.js"></script>
     <script type="text/javascript">
         window.frontend_url = (document.getElementsByTagName("base")[0]).href;
-        window.backend_url = 'http://localhost:8081/videogaze-BE/';
+        window.backend_url = window.frontend_url+'../videogaze-BE/';
 
         JSLoader.setFolder("js/");
         JSLoader.load_once("SPA.js", function(){

@@ -30,7 +30,7 @@
 </head>
 
 <body>
-    <div id="bglayer" class="vbox background-layer"><!-- background-layer">-->
+    <div id="bglayer" class="vbox background-layer">
     <header id="spa-top" class="vbox-top">
         <div id="folding-header" class="folding-div">
             <a onclick="SPA.setPage('start.html')" class="title"><h1>VideoGaze</h1></a>
@@ -38,7 +38,11 @@
             <a onclick="SPA.setPage('second.html')" href="#">#SECOND</a>
             <a onclick="SPA.setPage('lorem.html')" href="#">#LOREM_IPSUM</a>
         </div>
-        <div id="custom-controls" onclick="toggle_header.toggle_animation()">Test</div>
+        <div id="custom-controls">
+            Controls: 
+            <span id="custom-controls-extra"></span>
+            <a onclick="toggle_header.toggle_animation()">_fold/unfold</a>
+        </div>
     </header>
     <footer id="spa-app" class="vbox-bottom"></footer>
     <script src="./js/JSLoader.js"></script>

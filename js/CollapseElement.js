@@ -31,8 +31,8 @@ var CollapseElement = function(node_name){
         css_dynamic_animation.type = 'text/css';
         css_dynamic_animation.appendChild(document.createTextNode(
             ".folding-div{overflow:hidden;}\n"+
-            ".folding-div.hide{animation: folding_div_hide 1s forwards;}\n"+
-            ".folding-div.show{animation: folding_div_show 1s forwards;}\n"+
+            ".folding-div.hide{animation: folding_div_hide 0.5s forwards;}\n"+
+            ".folding-div.show{animation: folding_div_show 0.5s forwards;}\n"+
             "\n"+
             "@keyframes folding_div_hide{\n"+
             "    0%{max-height:"+_node_start_height+"px;}\n"+

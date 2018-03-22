@@ -19,4 +19,12 @@
             );
         });
     });
+    document.getElementById("custom-controls-extra").innerHTML = 
+        '<a onclick="makeRoom()">_Make a room with this video!</a> | ';
+
+    var makeRoom = function(){
+        JSLoader.load("room.js",function(){
+            alert("Loaded room.js");
+        });
+    }
 </script>

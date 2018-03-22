@@ -1,5 +1,7 @@
 var RoomHTTPEvents = (function(){
-    var fetch_data = function(method,url,form_data,xhr_timeout,callback){
+    var _mode=2; // 0=short polling, 1=long polling, 2=SSE
+
+    var xhr_fetch_data = function(method,url,form_data,xhr_timeout,callback){
         if(form_data===undefined) form_data=null;
         if(callback===undefined) callback=null;
         if(xhr_timeout===undefined) xhr_timeout=3000;
@@ -30,6 +32,23 @@ var RoomHTTPEvents = (function(){
         else                xhr.send();
     }
 
+    var sse_fetch_data = function(method,url,form_data,xhr_timeout,callback){
+        if(typeof (EventSource) !== 'undefined'){
+            var source = new EventSource(window.backend_url+
+                "room.php?mode="+form_data.get('mode')+"&roomcode="+form_data.get('roomcode')
+            );
+            source.onerror = function (event) {
+                console.log('SSE error:'+method+",URL="+url+",form_data="+form_data+",event="+JSON.stringify(event));
+            };
+            source.onmessage = function(event){
+                callback({status: 1, message: JSON.parse(event.data)});
+            }
+        }else{
+            xhr_fetch_data(method,url,form_data,xhr_timeout,callback);
+        }
+    }
+
+
     var init=function(roomcode,callback){
         if(roomcode===undefined) roomcode=null;
         if(callback===undefined) callback=null;
@@ -38,11 +57,11 @@ var RoomHTTPEvents = (function(){
 		fd.append("mode","init_stream");
         fd.append("roomcode",roomcode);
 
-        fetch_data(
+        xhr_fetch_data(
             'POST',
             window.backend_url+'room.php',
             fd, undefined, callback
-        )
+        );
     }
 
     var request=function(roomcode,request_type,request_value,callback){
@@ -54,11 +73,11 @@ var RoomHTTPEvents = (function(){
         fd.append("request_type",request_type);
         fd.append("request_value",request_value);
 
-        fetch_data(
+        xhr_fetch_data(
             'POST',
             window.backend_url+'room.php',
             fd, undefined, callback
-        )
+        );
     }
 
     var sync=function(roomcode,callback){
@@ -68,11 +87,19 @@ var RoomHTTPEvents = (function(){
         fd.append("mode","sync");
         fd.append("roomcode",roomcode);
 
-        fetch_data(
-            'POST',
-            window.backend_url+'room.php',
-            fd, undefined, callback
-        )
+        if(_mode==0){
+            xhr_fetch_data(
+                'POST',
+                window.backend_url+'room.php',
+                fd, undefined, callback
+            );
+        }else if(_mode==2){
+            sse_fetch_data(
+                'POST',
+                window.backend_url+'room.php',
+                fd, undefined, callback
+            );
+        }
     }
 
     return{
@@ -150,10 +177,10 @@ var Room = (function(){
         if(first_time) _sync_enabled=true;
         if(_sync_enabled){
             if(!_is_attempting_requests){
-                console.log("here");
+                //console.log("here");
                 sync(function(server_sync){
-                    console.log(server_sync);
-                    console.log(server_sync.status==1 && !_is_attempting_requests);
+                    //console.log(server_sync);
+                    //console.log(server_sync.status==1 && !_is_attempting_requests);
                     if(server_sync.status==1 && !_is_attempting_requests){
                         _sync_ignore_events=true;
                         server_sync=server_sync.message;
@@ -164,7 +191,7 @@ var Room = (function(){
                         }
                         _sync_ignore_events=false;
                     }
-                    SmartTimeout.setSmartTimeout('room_sync',function(){start_sync(false);},250);
+                    SmartTimeout.setSmartTimeout('room_sync',function(){start_sync(false);},25000);
                 });
             }else{console.log("lol");SmartTimeout.setSmartTimeout('room_sync',function(){start_sync(false);},250);}
         }

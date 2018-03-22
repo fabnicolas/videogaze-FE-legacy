@@ -15,13 +15,13 @@ var RoomHTTPEvents = (function(){
                 if(xhr.status == 200){
                     if(callback!=null) callback(JSON.parse(xhr.response));
                 }else{
-                    setTimeout(fetch_data(method,url,form_data,xhr_timeout,callback),1000);
+                    setTimeout(xhr_fetch_data(method,url,form_data,xhr_timeout,callback),1000);
                 }
             }
         };
 
         xhr.ontimeout = function(){
-            setTimeout(fetch_data(method,url,form_data,xhr_timeout,callback),1000);
+            setTimeout(xhr_fetch_data(method,url,form_data,xhr_timeout,callback),1000);
         }
         
         xhr.onerror = function(){ 

@@ -1,2 +1,3 @@
 RewriteEngine On
 RewriteRule ^video/(.*)?$ index.php?video_url=$1 [NC,L]
+RewriteRule ^room/(.*)?$ index.php?roomcode=$1 [NC,L]

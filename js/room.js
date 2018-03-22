@@ -33,15 +33,22 @@ var RoomHTTPEvents = (function(){
     }
 
     var sse_fetch_data = function(method,url,form_data,xhr_timeout,callback){
-        if(typeof (EventSource) !== 'undefined'){
+        if(typeof(EventSource) !== 'undefined'){
             var source = new EventSource(window.backend_url+
                 "room.php?mode="+form_data.get('mode')+"&roomcode="+form_data.get('roomcode')
             );
             source.onerror = function (event) {
                 console.log('SSE error:'+method+",URL="+url+",form_data="+form_data+",event="+JSON.stringify(event));
+                source.close();
             };
             source.onmessage = function(event){
-                callback({status: 1, message: JSON.parse(event.data)});
+                var server_message = JSON.parse(event.data);
+                console.log(server_message);
+                if(!(server_message.status==0 && server_message.message=="SSE_CLOSE_CONNECTION")){
+                    callback(server_message);
+                }else{
+                    source.close();
+                }
             }
         }else{
             xhr_fetch_data(method,url,form_data,xhr_timeout,callback);

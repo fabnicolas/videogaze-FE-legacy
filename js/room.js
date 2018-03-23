@@ -223,20 +223,25 @@ var Room = (function(){
     }
 
     var set_isplaying=function(isplaying,videotime){
-        http_room_request('set_isplaying',(isplaying==true?1:0),{'request_videotime': videotime});
+        http_room_request('set_isplaying',(isplaying==true?1:0),{'request_videotime': round_time(videotime,6)});
     }
 
     var set_current_time=function(videotime){
-        http_room_request('set_current_time',videotime);
+        http_room_request('set_current_time',round_time(videotime,6));
     }
 
+    var round_time=function(value, decimals) {
+        return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+    }
+      
+
     var event_notrigger=function(event_name,callback){
-        for(var i=0;i<event_name.length;i++){
-            _videoplayer.off(event_name[i]);
+        for(var ient=0;ient<event_name.length;ient++){
+            _videoplayer.off(event_name[ient],_event_handlers[event_name[ient]]);
         }
         callback();
-        for(var i=0;i<event_name.length;i++){
-            _videoplayer.on(event_name[i],_event_handlers[event_name[i]]);
+        for(var ient=0;ient<event_name.length;ient++){
+            _videoplayer.on(event_name[ient],_event_handlers[event_name[ient]]);
         }
     }
 
@@ -325,14 +330,14 @@ var Room = (function(){
         _videoplayer = videojs(video_player_id);
 
         _event_handlers['loadeddata']=function(){
-            var player_time=(new Date()).getTime();
-            console.log("[videojs_event] Video took: "+(player_time-actual_time)+" ms to buffer!");
+            var player_actual_time=(new Date()).getTime();
+            console.log("[videojs_event] Video took: "+(player_actual_time-actual_time)+" ms to buffer!");
             start_sync(true);
         }
 
-        _event_handlers['timeupdate']=function(){
+        /*_event_handlers['timeupdate']=function(){
             console.log("Current time, timeupdate = "+_videoplayer.currentTime());
-        }
+        }*/
 
         _event_handlers['playing']=function(){
             if(!_sync_ignore_events){
@@ -373,13 +378,14 @@ var Room = (function(){
             }
         }
 
-        _videoplayer.on('loadeddata',_event_handlers['loadeddata']);
-        _videoplayer.on('timeupdate',_event_handlers['timeupdate']);
+        _videoplayer.one('loadeddata',_event_handlers['loadeddata']);
+        //_videoplayer.on('timeupdate',_event_handlers['timeupdate']);
         _videoplayer.on('playing', _event_handlers['playing']);
         _videoplayer.on('waiting',_event_handlers['waiting']);
         _videoplayer.on('pause',_event_handlers['pause']);
         _videoplayer.on('seeking',_event_handlers['seeking']);
         _videoplayer.on('seeked',_event_handlers['seeked']);
+
         if(callback!=null) callback();
     }
 
@@ -391,6 +397,7 @@ var Room = (function(){
         init: init,
         get_data: get_data,
         attach_videojs_handler: attach_videojs_handler,
-        get_video_player: get_video_player
+        get_video_player: get_video_player,
+        start_sync: start_sync
     }
 })();

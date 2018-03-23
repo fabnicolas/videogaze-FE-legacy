@@ -1,45 +1,80 @@
+var DateTimeParser = (function(){
+    var get_timestamp=function(date_str){
+        return new Date(Date.parse(date_str)).getTime();
+    }
+    return{get_timestamp: get_timestamp}
+})();
+
 var RoomHTTPEvents = (function(){
     var _mode=2; // 0=short polling, 1=long polling, 2=SSE
 
-    var xhr_fetch_data = function(method,url,form_data,xhr_timeout,callback){
+    var repeat_checktype=function(repeat_data,repeat_typetocheck){
+        return repeat_data!=null &&
+                repeat_data.hasOwnProperty("repeat_type") &&
+                repeat_data.repeat_type==repeat_typetocheck;
+    }
+
+
+
+    var xhr_fetch_data = function(method,url,form_data,xhr_timeout,repeat_data,callback){
         if(form_data===undefined) form_data=null;
-        if(callback===undefined) callback=null;
         if(xhr_timeout===undefined) xhr_timeout=3000;
+        if(repeat_data===undefined) repeat_data=null;
+        if(callback===undefined) callback=null;
 
         var xhr = new XMLHttpRequest();
         xhr.open(method, url, true);
         xhr.timeout=xhr_timeout;
         
         xhr.onreadystatechange = function(){
-            if(xhr.readyState == 4){
-                if(xhr.status == 200){
-                    if(callback!=null) callback(JSON.parse(xhr.response));
-                }else{
-                    setTimeout(xhr_fetch_data(method,url,form_data,xhr_timeout,callback),1000);
+            if(xhr.readyState == 4 && xhr.status == 200){
+                if(callback!=null) callback(JSON.parse(xhr.response));
+                if(repeat_checktype(repeat_data,'always')){
+                    setTimeout(xhr_fetch_data(method,url,form_data,xhr_timeout,callback),repeat_data.repeat_time);
+                }
+            }else{
+                if(repeat_checktype(repeat_data,'onerror') || repeat_checktype(repeat_data,'always')){
+                    setTimeout(xhr_fetch_data(method,url,form_data,xhr_timeout,callback),repeat_data.repeat_time);
                 }
             }
         };
 
         xhr.ontimeout = function(){
-            setTimeout(xhr_fetch_data(method,url,form_data,xhr_timeout,callback),1000);
+            if(repeat_checktype(repeat_data,'onerror') || repeat_checktype(repeat_data,'always')){
+                setTimeout(xhr_fetch_data(method,url,form_data,xhr_timeout,callback),repeat_data.repeat_time);
+            }
         }
         
         xhr.onerror = function(){ 
             console.log("XHR error: "+method+",URL="+url+",form_data="+form_data);
+            if(repeat_checktype(repeat_data,'onerror') || repeat_checktype(repeat_data,'always')){
+                setTimeout(xhr_fetch_data(method,url,form_data,xhr_timeout,callback),repeat_data.repeat_time);
+            }
         }; 
         
         if(form_data!=null) xhr.send(form_data);
         else                xhr.send();
     }
 
-    var sse_fetch_data = function(method,url,form_data,xhr_timeout,callback){
+    var sse_fetch_data = function(method,url,form_data,xhr_timeout,repeat_data,callback){
+        if(form_data===undefined) form_data=null;
+        if(xhr_timeout===undefined) xhr_timeout=3000;
+        if(repeat_data===undefined) repeat_data=null;
+        if(callback===undefined) callback=null;
+
         if(typeof(EventSource) !== 'undefined'){
-            var source = new EventSource(window.backend_url+
-                "room.php?mode="+form_data.get('mode')+"&roomcode="+form_data.get('roomcode')
+            var source = new EventSource(url+
+                "?mode="+form_data.get('mode')+"&roomcode="+form_data.get('roomcode')
             );
-            source.onerror = function (event) {
+            source.onerror = function(event){
                 console.log('SSE error:'+method+",URL="+url+",form_data="+form_data+",event="+JSON.stringify(event));
                 source.close();
+                source.close();
+                if(repeat_checktype(repeat_data,'onerror') || repeat_checktype(repeat_data,'always')){
+                    setTimeout(
+                        sse_fetch_data(method,url,form_data,xhr_timeout,repeat_data,callback),
+                    repeat_data.repeat_time);
+                }
             };
             source.onmessage = function(event){
                 var server_message = JSON.parse(event.data);
@@ -48,12 +83,18 @@ var RoomHTTPEvents = (function(){
                     callback(server_message);
                 }else{
                     source.close();
+                    if(repeat_checktype(repeat_data,'always')){
+                        setTimeout(
+                            sse_fetch_data(method,url,form_data,xhr_timeout,repeat_data,callback),
+                        repeat_data.repeat_time);
+                    }
                 }
             }
         }else{
-            xhr_fetch_data(method,url,form_data,xhr_timeout,callback);
+            xhr_fetch_data(method,url,form_data,xhr_timeout,repeat_data,callback);
         }
     }
+
 
 
     var init=function(roomcode,callback){
@@ -67,11 +108,12 @@ var RoomHTTPEvents = (function(){
         xhr_fetch_data(
             'POST',
             window.backend_url+'room.php',
-            fd, undefined, callback
+            fd, undefined, {repeat_type: 'onerror', repeat_time: 250}, callback
         );
     }
 
-    var request=function(roomcode,request_type,request_value,callback){
+    var request=function(roomcode,request_type,request_value,extra_data,callback){
+        if(extra_data)
         if(callback===undefined) callback=null;
 
         var fd = new FormData();
@@ -79,11 +121,14 @@ var RoomHTTPEvents = (function(){
         fd.append("roomcode",roomcode);
         fd.append("request_type",request_type);
         fd.append("request_value",request_value);
+        for(var extra_data_param_name in extra_data){
+            fd.append(extra_data_param_name,extra_data[extra_data_param_name]);
+        }
 
         xhr_fetch_data(
             'POST',
             window.backend_url+'room.php',
-            fd, undefined, callback
+            fd, undefined, {repeat_type: 'onerror', repeat_time: 250}, callback
         );
     }
 
@@ -98,16 +143,18 @@ var RoomHTTPEvents = (function(){
             xhr_fetch_data(
                 'POST',
                 window.backend_url+'room.php',
-                fd, undefined, callback
+                fd, undefined, {repeat_type: 'always', repeat_time: 250}, callback
             );
         }else if(_mode==2){
             sse_fetch_data(
                 'POST',
                 window.backend_url+'room.php',
-                fd, undefined, callback
+                fd, undefined, {repeat_type: 'always', repeat_time: 250}, callback
             );
         }
     }
+
+
 
     return{
         init: init,
@@ -140,6 +187,7 @@ var Room = (function(){
     var _sync_enabled=false;
     var _is_attempting_requests=false;
     var _sync_ignore_events=false;
+    var _local_time_last_current_time=0;
 
     var get_data=function(){return _roomdata;}
 
@@ -156,9 +204,12 @@ var Room = (function(){
         });
     }
 
-    var http_room_request=function(request_type,request_value){
+    var http_room_request=function(request_type,request_value,extra_data){
+        if(extra_data===undefined) extra_data=null;
+
         _is_attempting_requests=true;
-        RoomHTTPEvents.request(_roomdata.roomcode,request_type,request_value,function(){
+        console.log("[room] request("+JSON.stringify(arguments)+")");
+        RoomHTTPEvents.request(_roomdata.roomcode,request_type,request_value,extra_data,function(){
             _is_attempting_requests=false;
         });
     }
@@ -167,12 +218,12 @@ var Room = (function(){
         http_room_request('set_stream',stream_type+";key="+stream_key);
     }
 
-    var set_isplaying=function(isplaying){
-        http_room_request('set_isplaying',(isplaying==true?1:0));
+    var set_isplaying=function(isplaying,videotime){
+        http_room_request('set_isplaying',(isplaying==true?1:0),{'request_videotime': videotime});
     }
 
-    var set_current_time=function(current_time){
-        http_room_request('set_current_time',current_time);
+    var set_current_time=function(videotime){
+        http_room_request('set_current_time',videotime);
     }
 
     var sync=function(callback){
@@ -184,23 +235,40 @@ var Room = (function(){
         if(first_time) _sync_enabled=true;
         if(_sync_enabled){
             if(!_is_attempting_requests){
-                //console.log("here");
                 sync(function(server_sync){
-                    //console.log(server_sync);
-                    //console.log(server_sync.status==1 && !_is_attempting_requests);
                     if(server_sync.status==1 && !_is_attempting_requests){
                         _sync_ignore_events=true;
+                        
                         server_sync=server_sync.message;
                         console.log(server_sync);
+                        
+                        
+                        if(server_sync.hasOwnProperty("stream_current_time") &&
+                            server_sync.hasOwnProperty("time_last_current_time")){
+                            server_sync.time_last_current_time=DateTimeParser.get_timestamp(server_sync.time_last_current_time);
+                            console.log("time_cached="+_local_time_last_current_time);
+                            console.log("time_server="+server_sync.time_last_current_time);
+                            
+                            if((server_sync.time_last_current_time-_local_time_last_current_time) > 1000){
+                                var video_wasplaying = _videoplayer.isplaying;
+                                if(video_wasplaying) _videoplayer.pause();
+                                _videoplayer.currentTime(server_sync.stream_current_time);
+                                if(video_wasplaying) _videoplayer.play();
+
+                                console.log("Difference: "+(server_sync.time_last_current_time-_local_time_last_current_time));
+                                _local_time_last_current_time=server_sync.time_last_current_time;
+                            }
+                        }
+                        
                         if(server_sync.hasOwnProperty("stream_isplaying")){
                             if(server_sync.stream_isplaying==1) _videoplayer.play();
                             else                                _videoplayer.pause();
                         }
-                        _sync_ignore_events=false;
+                        
+                        setTimeout(function(){_sync_ignore_events=false;},250);
                     }
-                    SmartTimeout.setSmartTimeout('room_sync',function(){start_sync(false);},25000);
                 });
-            }else{console.log("lol");SmartTimeout.setSmartTimeout('room_sync',function(){start_sync(false);},250);}
+            }else{SmartTimeout.setSmartTimeout('room_sync',function(){start_sync(false);},250);}
         }
     }
 
@@ -215,38 +283,44 @@ var Room = (function(){
         _videoplayer = videojs(video_player_id);
         _videoplayer.on('loadeddata',function(){
             var player_time=(new Date()).getTime();
-            console.log("Video took: "+(player_time-actual_time)+" ms to buffer!");
+            console.log("[videojs_event] Video took: "+(player_time-actual_time)+" ms to buffer!");
             start_sync(true);
         });
         _videoplayer.on('timeupdate',function(){
-            console.log("Current time, timeupdate = "+_videoplayer.currentTime());
+            //console.log("Current time, timeupdate = "+_videoplayer.currentTime());
         })
         _videoplayer.on('playing',function(){
             if(!_sync_ignore_events){
                 _is_attempting_requests=true;
-                console.log("Video playing at time: "+_videoplayer.currentTime());
+                console.log("[videojs_event]","Video playing at time: "+_videoplayer.currentTime());
                 SmartTimeout.setSmartTimeout('playing',function(){
-                    set_isplaying(!(_videoplayer.paused()));
+                    set_isplaying(!_videoplayer.paused(), _videoplayer.currentTime());
                 },300);
             }
         });
         _videoplayer.on('waiting',function(){
-            console.log("Video is buffering...");
+            console.log("[videojs_event] Video is buffering...");
         });
         _videoplayer.on('pause',function(){
             if(!_sync_ignore_events){
                 _is_attempting_requests=true;
-                console.log("Video paused.");
+                console.log("[videojs_event]","Video paused.");
                 SmartTimeout.setSmartTimeout('playing',function(){
-                    set_isplaying(!(_videoplayer.paused()));
+                    set_isplaying(!_videoplayer.paused(), _videoplayer.currentTime());
                 },300);
             }
         });
         _videoplayer.on('seeking',function(){
-            console.log("Video seeking...");
+            console.log("[videojs_event] Video seeking...");
         });
         _videoplayer.on('seeked',function(){
-            console.log("Video seeked at time: "+_videoplayer.currentTime());
+            console.log("[videojs_event]","Video seeked at time: "+_videoplayer.currentTime());
+            if(!_sync_ignore_events){
+                _is_attempting_requests=true;
+                SmartTimeout.setSmartTimeout('seeking',function(){
+                    set_current_time(_videoplayer.currentTime());
+                },200);
+            }
         });
         if(callback!=null) callback();
     }

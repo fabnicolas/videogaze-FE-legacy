@@ -1,6 +1,7 @@
 var DateTimeParser = (function(){
     var get_timestamp=function(date_str){
-        return new Date(Date.parse(date_str)).getTime();
+        if(date_str===undefined) date_str=null;
+        return new Date(date_str!=null ? Date.parse(date_str): Date.now()).getTime();
     }
     return{get_timestamp: get_timestamp}
 })();
@@ -187,7 +188,9 @@ var Room = (function(){
     var _sync_enabled=false;
     var _is_attempting_requests=false;
     var _sync_ignore_events=false;
-    var _local_time_last_current_time=0;
+    var _local_last_ctime=0;
+    var _local_last_isplaying=0;
+    var _buffering_time=0;
 
     var get_data=function(){return _roomdata;}
 
@@ -231,32 +234,55 @@ var Room = (function(){
     }
 
     var start_sync=function(first_time){
+        console.log(Math.round('642.442560'*1000));
         console.log("start_sync("+JSON.stringify(arguments)+","+_is_attempting_requests+")");
         if(first_time) _sync_enabled=true;
         if(_sync_enabled){
             if(!_is_attempting_requests){
                 sync(function(server_sync){
-                    if(server_sync.status==1 && !_is_attempting_requests){
+                    if(!_is_attempting_requests && server_sync.status==1){
                         _sync_ignore_events=true;
                         
                         server_sync=server_sync.message;
                         console.log(server_sync);
                         
                         
-                        if(server_sync.hasOwnProperty("stream_current_time") &&
-                            server_sync.hasOwnProperty("time_last_current_time")){
-                            server_sync.time_last_current_time=DateTimeParser.get_timestamp(server_sync.time_last_current_time);
-                            console.log("time_cached="+_local_time_last_current_time);
-                            console.log("time_server="+server_sync.time_last_current_time);
+                        if(server_sync.hasOwnProperty("stream_ctime") &&
+                            server_sync.hasOwnProperty("last_ctime") &&
+                            server_sync.hasOwnProperty("last_isplaying")){
+                            server_sync.last_ctime=DateTimeParser.get_timestamp(server_sync.last_ctime);
+                            server_sync.last_isplaying=DateTimeParser.get_timestamp(server_sync.last_isplaying);
+                            console.log("time_cached="+_local_last_ctime);
+                            console.log("time_server="+server_sync.last_ctime);
                             
-                            if((server_sync.time_last_current_time-_local_time_last_current_time) > 1000){
-                                var video_wasplaying = _videoplayer.isplaying;
-                                if(video_wasplaying) _videoplayer.pause();
-                                _videoplayer.currentTime(server_sync.stream_current_time);
-                                if(video_wasplaying) _videoplayer.play();
+                            if(first_time==true){
+                                if(server_sync.stream_isplaying==1){
+                                    console.log((DateTimeParser.get_timestamp() -
+                                    server_sync.last_isplaying +
+                                    Math.round(server_sync.stream_ctime*1000)
+                                    )/1000);
+                                    _videoplayer.currentTime(
+                                        (DateTimeParser.get_timestamp() -
+                                        server_sync.last_isplaying +
+                                        Math.round(server_sync.stream_ctime*1000)
+                                        )/1000
+                                    );
+                                }else{
+                                    _videoplayer.currentTime(
+                                        server_sync.stream_ctime
+                                    );
+                                }
+                                _local_last_ctime=server_sync.last_ctime;
+                            }else{
+                                if(Math.abs(server_sync.last_ctime-_local_last_ctime) > 1000){
+                                    var video_wasplaying = _videoplayer.isplaying;
+                                    if(video_wasplaying) _videoplayer.pause();
+                                    _videoplayer.currentTime(server_sync.stream_ctime);
+                                    if(video_wasplaying) _videoplayer.play();
 
-                                console.log("Difference: "+(server_sync.time_last_current_time-_local_time_last_current_time));
-                                _local_time_last_current_time=server_sync.time_last_current_time;
+                                    console.log("Difference: "+(server_sync.last_ctime-_local_last_ctime));
+                                    _local_last_ctime=server_sync.last_ctime;
+                                }
                             }
                         }
                         
@@ -265,6 +291,7 @@ var Room = (function(){
                             else                                _videoplayer.pause();
                         }
                         
+                        first_time=false;
                         setTimeout(function(){_sync_ignore_events=false;},250);
                     }
                 });
@@ -289,7 +316,7 @@ var Room = (function(){
         _videoplayer.on('timeupdate',function(){
             //console.log("Current time, timeupdate = "+_videoplayer.currentTime());
         })
-        _videoplayer.on('playing',function(){
+        _videoplayer.on('playing', function(){
             if(!_sync_ignore_events){
                 _is_attempting_requests=true;
                 console.log("[videojs_event]","Video playing at time: "+_videoplayer.currentTime());
@@ -299,6 +326,7 @@ var Room = (function(){
             }
         });
         _videoplayer.on('waiting',function(){
+            _buffering_time=(new Date()).getTime();
             console.log("[videojs_event] Video is buffering...");
         });
         _videoplayer.on('pause',function(){

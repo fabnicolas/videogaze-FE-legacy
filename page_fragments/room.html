@@ -48,6 +48,19 @@
                         });
                     }
                 );
+            }else if(room_data.stream_type=='external_mp4'){
+                VideoJSPlayer.inject_external_mp4_video_player(
+                    document.getElementById("video_player_container"),
+                    "my_video",
+                    video_to_play,
+                    '',
+                    function(){
+                        Room.attach_videojs_handler("my_video",function(){
+                            console.log("CONTROLS ATTACHED!");
+                            Room.start_sync(true);
+                        });
+                    }
+                );
             }
         });
     }

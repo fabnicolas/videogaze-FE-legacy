@@ -58,6 +58,7 @@ var VideoJSPlayer = (function(){
         +  '\n</p>'
         +'\n</video>';
         node.innerHTML = body_data;
+        
         if(callback!=null) callback();
     }
 
@@ -77,6 +78,7 @@ var VideoJSPlayer = (function(){
         +  '\n</p>'
         +'\n</video>';
         node.innerHTML = body_data;
+
         if(callback!=null) callback();
     }
 
@@ -92,6 +94,7 @@ var VideoJSPlayer = (function(){
             +'"sources": [{ "type": "video/youtube", "src": "'+video_id+'"}] }\'\n'
             +'></video>';
             node.innerHTML = body_data;
+
             if(callback!=null) callback();
         });
     }

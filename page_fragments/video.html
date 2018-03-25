@@ -5,8 +5,7 @@
     <script src="http://vjs.zencdn.net/ie8/1.1.2/videojs-ie8.min.js"></script>
 </head>
 
-<div class="content" id="video_player_container">
-</div>
+<div class="content" id="video_player_container"></div>
 
 <script type="text/javascript">
     JSLoader.load("video_player.js",function(){
@@ -20,11 +19,21 @@
         });
     });
     document.getElementById("custom-controls-extra").innerHTML = 
-        '<a onclick="makeRoom()">_Make a room with this video!</a> | ';
+        '<a onclick="make_room()">_Make a room with this video!</a> | ';
 
-    var makeRoom = function(){
+    var make_room = function(){
         JSLoader.load("room.js",function(){
-            alert("Loaded room.js");
+            Room.init(null,
+                {'stream_type': 'local', 'stream_key': SPA.getVar('video_to_play')},
+                function(response){
+                    if(response.status==1){
+                        console.log('test1',SPA.getVar('roomcode'));
+                        console.log('test2',response.message.roomcode);
+                        SPA.setVar('roomcode',response.message.roomcode);
+                        SPA.setPage("room.html");
+                    }
+                }
+            );
         });
     }
 </script>

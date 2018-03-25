@@ -1,0 +1,26 @@
+<div class="content text-top-space">
+    Insert .mp4 URL: <input type="text" id="video_mp4_url" value=""/>
+    <input type="button" onclick="make_room('external_mp4', 'video_mp4_url')" value="Go!"/>
+    <br/><br/>
+    <h4>OR</h4>
+    <br/><br/>
+    Insert YouTube URL here: <input type="text" id="youtube_url" value=""/>
+    <input type="button" onclick="make_room('youtube', 'youtube_url')" value="Go!"/>
+</div>
+
+<script type="text/javascript">
+    var make_room = function(stream_type, stream_key){
+        SPA.setVar('video_to_play', document.getElementById(stream_key).value);
+        JSLoader.load("room.js",function(){
+            Room.init(null,
+                {'stream_type': stream_type, 'stream_key': SPA.getVar('video_to_play')},
+                function(response){
+                    if(response.status==1){
+                        SPA.setVar('roomcode',response.message.roomcode);
+                        SPA.setPage("room.html");
+                    }
+                }
+            );
+        });
+    }
+</script>

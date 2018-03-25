@@ -28,26 +28,30 @@ var RoomHTTPEvents = (function(){
         xhr.timeout=xhr_timeout;
         
         xhr.onreadystatechange = function(){
-            if(xhr.readyState == 4 && xhr.status == 200){
-                if(callback!=null) callback(JSON.parse(xhr.response));
-                if(repeat_checktype(repeat_data,'always')){
-                    setTimeout(xhr_fetch_data(method,url,form_data,xhr_timeout,callback),repeat_data.repeat_time);
-                }
-            }else{
-                if(repeat_checktype(repeat_data,'onerror') || repeat_checktype(repeat_data,'always')){
-                    setTimeout(xhr_fetch_data(method,url,form_data,xhr_timeout,callback),repeat_data.repeat_time);
+            if(xhr.readyState == 4){
+                if(xhr.status == 200){
+                    console.log('xhr_response',method,url,JSON.parse(xhr.response).message);
+                    if(callback!=null) callback(JSON.parse(xhr.response));
+                    if(repeat_checktype(repeat_data,'always')){
+                        setTimeout(xhr_fetch_data(method,url,form_data,xhr_timeout,callback),repeat_data.repeat_time);
+                    }
+                }else{
+                    if(repeat_checktype(repeat_data,'onerror') || repeat_checktype(repeat_data,'always')){
+                        setTimeout(xhr_fetch_data(method,url,form_data,xhr_timeout,callback),repeat_data.repeat_time);
+                    }
                 }
             }
         };
 
         xhr.ontimeout = function(){
+            console.log("XHR: onTimeout["+method+",URL="+url+",form_data="+form_data+"]");
             if(repeat_checktype(repeat_data,'onerror') || repeat_checktype(repeat_data,'always')){
                 setTimeout(xhr_fetch_data(method,url,form_data,xhr_timeout,callback),repeat_data.repeat_time);
             }
         }
         
         xhr.onerror = function(){ 
-            console.log("XHR error: "+method+",URL="+url+",form_data="+form_data);
+            console.log("XHR: onError["+method+",URL="+url+",form_data="+form_data+"]");
             if(repeat_checktype(repeat_data,'onerror') || repeat_checktype(repeat_data,'always')){
                 setTimeout(xhr_fetch_data(method,url,form_data,xhr_timeout,callback),repeat_data.repeat_time);
             }
@@ -98,13 +102,20 @@ var RoomHTTPEvents = (function(){
 
 
 
-    var init=function(roomcode,callback){
+    var init=function(roomcode,extra_data,callback){
         if(roomcode===undefined) roomcode=null;
+        if(extra_data===undefined) extra_data=null;
         if(callback===undefined) callback=null;
+        
+        console.log(arguments);
 
         var fd = new FormData();
+
 		fd.append("mode","init_stream");
         fd.append("roomcode",roomcode);
+        if(extra_data!=null) for(var extra_data_param_name in extra_data){
+            fd.append(extra_data_param_name,extra_data[extra_data_param_name]);
+        }
 
         xhr_fetch_data(
             'POST',
@@ -114,7 +125,7 @@ var RoomHTTPEvents = (function(){
     }
 
     var request=function(roomcode,request_type,request_value,extra_data,callback){
-        if(extra_data)
+        if(extra_data===undefined) extra_data=null;
         if(callback===undefined) callback=null;
 
         var fd = new FormData();
@@ -122,7 +133,7 @@ var RoomHTTPEvents = (function(){
         fd.append("roomcode",roomcode);
         fd.append("request_type",request_type);
         fd.append("request_value",request_value);
-        for(var extra_data_param_name in extra_data){
+        if(extra_data!=null) for(var extra_data_param_name in extra_data){
             fd.append(extra_data_param_name,extra_data[extra_data_param_name]);
         }
 
@@ -195,11 +206,12 @@ var Room = (function(){
 
     var get_data=function(){return _roomdata;}
 
-    var init=function(roomcode,callback){
+    var init=function(roomcode,extra_data,callback){
         if(roomcode===undefined) roomcode=null;
+        if(extra_data===undefined) extra_data=null;
         if(callback===undefined) callback=null;
 
-        RoomHTTPEvents.init(roomcode,function(response){
+        RoomHTTPEvents.init(roomcode,extra_data,function(response){
             if(response.status==1){
                 _roomdata = response.message;
                 if(!response.message.hasOwnProperty("roomcode")) _roomdata.roomcode = roomcode;
@@ -389,6 +401,56 @@ var Room = (function(){
         if(callback!=null) callback();
     }
 
+    function set_room_content(video_container_id,video_player_id,room_data,callback){
+        if(callback===undefined) callback=null;
+
+        VideoJSPlayer.init(function(){
+            window.history.replaceState({}, document.title, './index.php?roomcode='+room_data.roomcode);
+            SPA.setVar("roomcode",room_data.roomcode);
+            SPA.setVar("video_to_play",room_data.stream_key);
+            var video_to_play = room_data.stream_key;
+            if(room_data.stream_type=='local'){
+                VideoJSPlayer.inject_local_video_player(
+                    video_container_id,
+                    video_player_id,
+                    video_to_play,
+                    '',
+                    function(){
+                        Room.attach_videojs_handler("my_video");
+                    }
+                );
+            }else if(room_data.stream_type=='youtube'){
+                VideoJSPlayer.inject_youtube_video_player(
+                    video_container_id,
+                    video_player_id,
+                    video_to_play,
+                    '',
+                    function(){
+                        Room.attach_videojs_handler("my_video",function(){
+                            console.log("CONTROLS ATTACHED!");
+                            Room.start_sync(true);
+                        });
+                    }
+                );
+            }else if(room_data.stream_type=='external_mp4'){
+                VideoJSPlayer.inject_external_mp4_video_player(
+                    video_container_id,
+                    video_player_id,
+                    video_to_play,
+                    '',
+                    function(){
+                        Room.attach_videojs_handler("my_video",function(){
+                            console.log("CONTROLS ATTACHED!");
+                            Room.start_sync(true);
+                        });
+                    }
+                );
+            }
+        });
+
+        if(callback!=null) callback();
+    }
+
     var get_video_player=function(){
         return _videoplayer;
     }
@@ -398,6 +460,7 @@ var Room = (function(){
         get_data: get_data,
         attach_videojs_handler: attach_videojs_handler,
         get_video_player: get_video_player,
-        start_sync: start_sync
+        start_sync: start_sync,
+        set_room_content: set_room_content
     }
 })();

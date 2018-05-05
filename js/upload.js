@@ -244,21 +244,22 @@ var ChunkUploader = (function() {
         var video_element = document.getElementById("video-preview");
 
         // File selected.
-        fileselect.addEventListener("change", eventhandler_fileselected, false);
+        if(fileselect!=null){
+            fileselect.addEventListener("change", eventhandler_fileselected, false);
 
-        // XHR2 available?
-        if((new XMLHttpRequest()).upload) {
-            // File drop handlers
-            filedrag.addEventListener("dragover", eventhandler_mousehover_dragging_file, false); // Mouse inside it
-            filedrag.addEventListener("dragleave", eventhandler_mousehover_dragging_file, false); // Mouse outside it
-            filedrag.addEventListener("drop", eventhandler_fileselected, false); // File dropped
-            filedrag.style.display = "block";
+            // XHR2 available?
+            if((new XMLHttpRequest()).upload) {
+                // File drop handlers
+                filedrag.addEventListener("dragover", eventhandler_mousehover_dragging_file, false); // Mouse inside it
+                filedrag.addEventListener("dragleave", eventhandler_mousehover_dragging_file, false); // Mouse outside it
+                filedrag.addEventListener("drop", eventhandler_fileselected, false); // File dropped
+                filedrag.style.display = "block";
 
-            // Remove submit button.
-            submitbutton.style.display = "none";
-            video_element.style.display = "none";
+                // Remove submit button.
+                submitbutton.style.display = "none";
+                video_element.style.display = "none";
+            }
         }
-
     }
 
     // If file management is allowed on the browser

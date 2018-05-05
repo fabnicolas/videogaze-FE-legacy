@@ -45,22 +45,30 @@ var SPA = (function(undefined){
         else              return null;
     }
 
-    var setPage=function(html_page){
+    var setPage=function(html_page,route){
+        if(route===undefined) route=null;
+
         DOMUtils.loadHTML(_page_fragments_folder+html_page, function(status, text){
             if(status==true){
                 DOMUtils.injectHTMLwJS(text,
                     document.getElementById("spa-app"),
                     _div_spajs
                 );
+                if(route!=null) setRoute(route);
             }
         });
+    }
+
+    var setRoute=function(route){
+        window.history.replaceState({}, document.title, route);
     }
 
     return{
         init: init,
         setVar: setVar,
         getVar: getVar,
-        setPage: setPage
+        setPage: setPage,
+        setRoute: setRoute
     }
 })();
 

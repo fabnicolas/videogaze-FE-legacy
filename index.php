@@ -4,9 +4,10 @@
 
     function base_url($frontend_dir=null){
         return sprintf(
-            "%s://%s/%s",
-            isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
+            "%s://%s%s/%s",
+            ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? 'https' : 'http'),
             $_SERVER['SERVER_NAME'],
+            ((isset($_SERVER['SERVER_PORT'])) ? (':'.$_SERVER['SERVER_PORT']) : ''),
             ($frontend_dir!=null?$frontend_dir.'/':'')
         );
     }
@@ -33,7 +34,7 @@
     <div id="bglayer" class="vbox background-layer">
     <header id="spa-top" class="vbox-top">
         <div id="folding-header" class="folding-div">
-            <a onclick="SPA.setPage('start.html')" class="title"><h1>VideoGaze</h1></a>
+            <a onclick="SPA.setPage('start.html','./')" class="title"><h1>VideoGaze</h1></a>
             <a onclick="SPA.setPage('start.html')" href="#">#START</a>
             <a onclick="SPA.setPage('second.html')" href="#">#SECOND</a>
             <a onclick="SPA.setPage('lorem.html')" href="#">#LOREM_IPSUM</a>
@@ -73,6 +74,8 @@
             });
         });
     </script>
+    
     </div>
+    
 </body>
 </html>

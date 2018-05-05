@@ -203,6 +203,7 @@ var Room = (function(){
     var _local_last_isplaying=0;
     var _buffering_time=0;
     var _event_handlers=[];
+    var _player_ready=false;
 
     var get_data=function(){return _roomdata;}
 
@@ -273,53 +274,56 @@ var Room = (function(){
                         
                         server_sync=server_sync.message;
                         console.log(server_sync);
-                        
-                        if(server_sync.hasOwnProperty("stream_ctime") &&
-                            server_sync.hasOwnProperty("last_ctime") &&
-                            server_sync.hasOwnProperty("last_isplaying")){
-                            server_sync.last_ctime=DateTimeParser.get_timestamp(server_sync.last_ctime);
-                            server_sync.last_isplaying=DateTimeParser.get_timestamp(server_sync.last_isplaying);
-                            console.log("time_cached="+_local_last_ctime);
-                            console.log("time_server="+server_sync.last_ctime);
-                            
-                            if(first_time==true){
-                                if(server_sync.stream_isplaying==1){
-                                    event_notrigger(['pause','playing','seeked'],function(){
-                                        _videoplayer.currentTime(
-                                            (DateTimeParser.get_timestamp() -
-                                            server_sync.last_isplaying +
-                                            Math.round(server_sync.stream_ctime*1000)
-                                            )/1000
-                                        );
-                                    });
-                                }else{
-                                    event_notrigger(['pause','playing','seeked'],function(){
-                                        _videoplayer.currentTime(
-                                            server_sync.stream_ctime
-                                        );
-                                    });
-                                }
-                                _local_last_ctime=server_sync.last_ctime;
-                            }else{
-                                if(Math.abs(server_sync.last_ctime-_local_last_ctime) > 1000){
-                                    var video_wasplaying = _videoplayer.isplaying;
-                                    if(video_wasplaying) event_notrigger('pause',function(){_videoplayer.pause();});
-                                    event_notrigger(['pause','playing','seeked'],function(){
-                                        _videoplayer.currentTime(server_sync.stream_ctime);
-                                    });
-                                    if(video_wasplaying) event_notrigger('playing',function(){_videoplayer.pause();});
-
-                                    console.log("Difference: "+(server_sync.last_ctime-_local_last_ctime));
+                        if(_player_ready==true){
+                            if(server_sync.hasOwnProperty("stream_ctime") &&
+                                server_sync.hasOwnProperty("last_ctime") &&
+                                server_sync.hasOwnProperty("last_isplaying")){
+                                server_sync.last_ctime=DateTimeParser.get_timestamp(server_sync.last_ctime);
+                                server_sync.last_isplaying=DateTimeParser.get_timestamp(server_sync.last_isplaying);
+                                console.log("time_cached="+_local_last_ctime);
+                                console.log("time_server="+server_sync.last_ctime);
+                                
+                                if(first_time==true){
+                                    if(server_sync.stream_isplaying==1){
+                                        event_notrigger(['pause','playing','seeked'],function(){
+                                            _videoplayer.currentTime(
+                                                (DateTimeParser.get_timestamp() -
+                                                server_sync.last_isplaying +
+                                                Math.round(server_sync.stream_ctime*1000)
+                                                )/1000
+                                            );
+                                        });
+                                    }else{
+                                        event_notrigger(['pause','playing','seeked'],function(){
+                                            _videoplayer.currentTime(
+                                                server_sync.stream_ctime
+                                            );
+                                        });
+                                    }
                                     _local_last_ctime=server_sync.last_ctime;
+                                }else{
+                                    if(Math.abs(server_sync.last_ctime-_local_last_ctime) > 1000){
+                                        var video_wasplaying = _videoplayer.isplaying;
+                                        if(video_wasplaying) event_notrigger('pause',function(){
+                                            _videoplayer.pause();
+                                        });
+                                        event_notrigger(['pause','playing','seeked'],function(){
+                                            _videoplayer.currentTime(server_sync.stream_ctime);
+                                        });
+                                        if(video_wasplaying) event_notrigger('playing',function(){_videoplayer.pause();});
+
+                                        console.log("Difference: "+(server_sync.last_ctime-_local_last_ctime));
+                                        _local_last_ctime=server_sync.last_ctime;
+                                    }
                                 }
                             }
-                        }
-                        
-                        if(server_sync.hasOwnProperty("stream_isplaying")){
-                            if(server_sync.stream_isplaying==1){
-                                event_notrigger(['playing'],function(){_videoplayer.play();});
-                            }else{
-                                event_notrigger(['pause'],function(){_videoplayer.pause();});
+                            
+                            if(server_sync.hasOwnProperty("stream_isplaying")){
+                                if(server_sync.stream_isplaying==1){
+                                    event_notrigger(['playing'],function(){_videoplayer.play();});
+                                }else{
+                                    event_notrigger(['pause'],function(){_videoplayer.pause();});
+                                }
                             }
                         }
                         
@@ -344,7 +348,7 @@ var Room = (function(){
         _event_handlers['loadeddata']=function(){
             var player_actual_time=(new Date()).getTime();
             console.log("[videojs_event] Video took: "+(player_actual_time-actual_time)+" ms to buffer!");
-            start_sync(true);
+            //start_sync(true);
         }
 
         /*_event_handlers['timeupdate']=function(){
@@ -398,6 +402,16 @@ var Room = (function(){
         _videoplayer.on('seeking',_event_handlers['seeking']);
         _videoplayer.on('seeked',_event_handlers['seeked']);
 
+        // On loaded meta data
+        _videoplayer.on('loadedmetadata',function(){
+            _videoplayer.play();
+            _videoplayer.pause();
+            console.log("[videojs_event] Loaded metadata");
+            _player_ready=true;
+            setTimeout(function(){start_sync(true)},1000); // Temporary
+        });
+        
+        // To monitor.
         if(callback!=null) callback();
     }
 
@@ -405,7 +419,7 @@ var Room = (function(){
         if(callback===undefined) callback=null;
 
         VideoJSPlayer.init(function(){
-            window.history.replaceState({}, document.title, './index.php?roomcode='+room_data.roomcode);
+            window.history.replaceState({}, document.title, './room/'+room_data.roomcode);
             SPA.setVar("roomcode",room_data.roomcode);
             SPA.setVar("video_to_play",room_data.stream_key);
             var video_to_play = room_data.stream_key;
@@ -428,7 +442,7 @@ var Room = (function(){
                     function(){
                         Room.attach_videojs_handler("my_video",function(){
                             console.log("CONTROLS ATTACHED!");
-                            Room.start_sync(true);
+                            //Room.start_sync(true);
                         });
                     }
                 );
@@ -441,7 +455,7 @@ var Room = (function(){
                     function(){
                         Room.attach_videojs_handler("my_video",function(){
                             console.log("CONTROLS ATTACHED!");
-                            Room.start_sync(true);
+                            //Room.start_sync(true);
                         });
                     }
                 );

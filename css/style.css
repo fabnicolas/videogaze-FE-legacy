@@ -88,6 +88,10 @@ body a:active{
 	padding-top: 10%;
 }
 
+.vjs-loading-spinner{
+	display: none !important;
+}
+
 /* Upload */
 #upload{
 	height: 100%;

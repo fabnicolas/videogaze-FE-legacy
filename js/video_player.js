@@ -11,10 +11,10 @@ var VideoJSPlayer = (function(){
             link_videojs_css.setAttribute("data-videojs","true");
             document.getElementsByTagName('head')[0].appendChild(link_videojs_css);
 
-            var script_videojs_js=document.createElement('script');
+            /*var script_videojs_js=document.createElement('script');
             script_videojs_js.src='http://vjs.zencdn.net/ie8/1.1.2/videojs-ie8.min.js';
             script_videojs_js.setAttribute("data-videojs","true");
-            document.getElementsByTagName('head')[0].appendChild(script_videojs_js);
+            document.getElementsByTagName('head')[0].appendChild(script_videojs_js);*/
 
             var script = document.createElement("script");
             script.src = "http://vjs.zencdn.net/6.6.3/video.js";
@@ -48,7 +48,7 @@ var VideoJSPlayer = (function(){
         if(callback===undefined) callback=null;
         
         var body_data = '<video id="'+player_id+'" style="width:100%;height:100%;" class="video-js" \n'
-        +'controls '+extra_video_elements+' preload="auto"'
+        +'controls playsinline '+extra_video_elements+' preload="auto"'
         +'\n data-setup="{}">'
         +'\n<source src="'+(window.backend_url)+'stream_mp4.php?filename='+filename+'"'
         +' type=\'video/mp4\'>'
@@ -68,7 +68,7 @@ var VideoJSPlayer = (function(){
         if(callback===undefined) callback=null;
         
         var body_data = '<video id="'+player_id+'" style="width:100%;height:100%;" class="video-js" \n'
-        +'controls '+extra_video_elements+' preload="auto"'
+        +'controls playsinline '+extra_video_elements+' preload="auto"'
         +'\n data-setup="{}">'
         +'\n<source src="'+url+'"'
         +' type=\'video/mp4\'>'
@@ -87,13 +87,21 @@ var VideoJSPlayer = (function(){
             if(player_id===undefined) player_id='my_video';
             if(extra_video_elements===undefined) extra_video_elements='';
             if(callback===undefined) callback=null;
-            
-            var body_data = '<video id="'+player_id+'" style="width:100%;height:100%;" class="video-js" \n'
-            +'controls '+extra_video_elements+' preload="auto"'
+
+            var body_data = '<video id="'+player_id+'" class="video-js vjs-default-skin" controls playsinline '+extra_video_elements+' preload="auto" style="width:100%;height:100%;"></video>';
+            //'data-setup=\'{ "techOrder": ["youtube"], "sources": [{ "type": "video/youtube", "src": "https://www.youtube.com/watch?v=FOnmjwSZBIU"}] }\'></video>';
+
+            /*var body_data = '<video id="'+player_id+'" style="width:100%;height:100%;" class="video-js" \n'
+            +'controls playsinline '+extra_video_elements+' preload="auto"'
             +'\n data-setup=\'{ "techOrder": ["youtube", "html5"], \n'
-            +'"sources": [{ "type": "video/youtube", "src": "'+video_id+'"}] }\'\n'
-            +'></video>';
+            +'"sources": [{ "type": "video/youtube", "src": "'+video_id+'?playsinline=1"}] }\'\n'
+            +'></video>';*/
             node.innerHTML = body_data;
+
+            videojs(player_id, {
+                "techOrder": ["youtube"],
+                "sources": [{"type": "video/youtube", "src": video_id}],
+            });
 
             if(callback!=null) callback();
         });

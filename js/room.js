@@ -37,7 +37,10 @@ var RoomHTTPEvents = (function(){
                     }
                 }else{
                     if(repeat_checktype(repeat_data,'onerror') || repeat_checktype(repeat_data,'always')){
-                        setTimeout(xhr_fetch_data(method,url,form_data,xhr_timeout,callback),repeat_data.repeat_time);
+                        var rtime=null;
+                        if(xhr.status == 508) rtime=5000;
+                        else                  rtime=repeat_data.repeat_time;
+                        setTimeout(xhr_fetch_data(method,url,form_data,xhr_timeout,callback),rtime);
                     }
                 }
             }

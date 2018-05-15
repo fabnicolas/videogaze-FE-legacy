@@ -110,7 +110,7 @@ var RoomHTTPEvents = (function(){
         if(extra_data===undefined) extra_data=null;
         if(callback===undefined) callback=null;
         
-        console.log(arguments);
+        //console.log(arguments);
 
         var fd = new FormData();
 
@@ -228,7 +228,7 @@ var Room = (function(){
         if(extra_data===undefined) extra_data=null;
 
         _is_attempting_requests=true;
-        console.log("[room] request("+JSON.stringify(arguments)+")");
+        //console.log("[room] request("+JSON.stringify(arguments)+")");
         RoomHTTPEvents.request(_roomdata.roomcode,request_type,request_value,extra_data,function(){
             _is_attempting_requests=false;
         });
@@ -266,8 +266,7 @@ var Room = (function(){
     }
 
     var start_sync=function(first_time){
-        console.log(Math.round('642.442560'*1000));
-        console.log("start_sync("+JSON.stringify(arguments)+","+_is_attempting_requests+")");
+        console.log("START_SYNC called (first_time="+first_time+"),iAR="+_is_attempting_requests);
         if(first_time) _sync_enabled=true;
         if(_sync_enabled){
             if(!_is_attempting_requests){
@@ -276,15 +275,15 @@ var Room = (function(){
                         _sync_ignore_events=true;
                         
                         server_sync=server_sync.message;
-                        console.log(server_sync);
+                        //console.log(server_sync);
                         if(_player_ready==true){
                             if(server_sync.hasOwnProperty("stream_ctime") &&
                                 server_sync.hasOwnProperty("last_ctime") &&
                                 server_sync.hasOwnProperty("last_isplaying")){
                                 server_sync.last_ctime=DateTimeParser.get_timestamp(server_sync.last_ctime);
                                 server_sync.last_isplaying=DateTimeParser.get_timestamp(server_sync.last_isplaying);
-                                console.log("time_cached="+_local_last_ctime);
-                                console.log("time_server="+server_sync.last_ctime);
+                                //console.log("time_cached="+_local_last_ctime);
+                                //console.log("time_server="+server_sync.last_ctime);
                                 
                                 if(first_time==true){
                                     if(server_sync.stream_isplaying==1){
@@ -310,7 +309,7 @@ var Room = (function(){
                                         if(video_wasplaying) event_notrigger('pause',function(){
                                             _videoplayer.pause();
                                         });
-                                        event_notrigger(['pause','playing','seeked'],function(){
+                                        event_notrigger(['pause','playing','seeking','waiting','playing','seeked'],function(){
                                             _videoplayer.currentTime(server_sync.stream_ctime);
                                         });
                                         if(video_wasplaying) event_notrigger('playing',function(){_videoplayer.pause();});
@@ -342,11 +341,19 @@ var Room = (function(){
         _sync_enabled=false;
     }
 
+    var request_sync=function(){
+        if(_sync_enabled==false){
+            _sync_enabled=true;
+            start_sync(true);
+        }
+    }
+
     var attach_videojs_handler=function(video_player_id,callback){
         if(callback===undefined) callback=null;
 
         var actual_time=(new Date()).getTime();
         _videoplayer = videojs(video_player_id);
+
 
         _event_handlers['loadeddata']=function(){
             var player_actual_time=(new Date()).getTime();
@@ -397,22 +404,24 @@ var Room = (function(){
             }
         }
 
+        _event_handlers['loadedmetadata']=function(){
+            _videoplayer.play();
+            _videoplayer.pause();
+            console.log("[videojs_event] Loaded metadata");
+            _player_ready=true;
+            setTimeout(function(){request_sync()},1000); // Temporary
+        }
+
         _videoplayer.one('loadeddata',_event_handlers['loadeddata']);
         //_videoplayer.on('timeupdate',_event_handlers['timeupdate']);
+        //_videoplayer.on('canplay',_event_handlers['canplay']);
         _videoplayer.on('playing', _event_handlers['playing']);
         _videoplayer.on('waiting',_event_handlers['waiting']);
         _videoplayer.on('pause',_event_handlers['pause']);
         _videoplayer.on('seeking',_event_handlers['seeking']);
         _videoplayer.on('seeked',_event_handlers['seeked']);
-
-        // On loaded meta data
-        _videoplayer.on('loadedmetadata',function(){
-            _videoplayer.play();
-            _videoplayer.pause();
-            console.log("[videojs_event] Loaded metadata");
-            _player_ready=true;
-            setTimeout(function(){start_sync(true)},1000); // Temporary
-        });
+        _videoplayer.on('loadedmetadata',_event_handlers['loadedmetadata']);
+        
         
         // To monitor.
         if(callback!=null) callback();
@@ -443,10 +452,7 @@ var Room = (function(){
                     video_to_play,
                     '',
                     function(){
-                        Room.attach_videojs_handler("my_video",function(){
-                            console.log("CONTROLS ATTACHED!");
-                            //Room.start_sync(true);
-                        });
+                        Room.attach_videojs_handler("my_video");
                     }
                 );
             }else if(room_data.stream_type=='external_mp4'){
@@ -456,10 +462,7 @@ var Room = (function(){
                     video_to_play,
                     '',
                     function(){
-                        Room.attach_videojs_handler("my_video",function(){
-                            console.log("CONTROLS ATTACHED!");
-                            //Room.start_sync(true);
-                        });
+                        Room.attach_videojs_handler("my_video");
                     }
                 );
             }
@@ -477,7 +480,7 @@ var Room = (function(){
         get_data: get_data,
         attach_videojs_handler: attach_videojs_handler,
         get_video_player: get_video_player,
-        start_sync: start_sync,
+        request_sync: request_sync,
         set_room_content: set_room_content
     }
 })();

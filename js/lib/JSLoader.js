@@ -6,7 +6,7 @@
  * 
  * Comments are for developers ease of use; please minify those scripts in production for maximum performances.
  * 
- * Normal usage:
+ * Example:
  *  '''
  *  <script src="./js/lib/JSLoader.js"></script>
  *  <script>

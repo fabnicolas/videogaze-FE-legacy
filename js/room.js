@@ -30,10 +30,14 @@ var RoomHTTPEvents = (function(){
         xhr.onreadystatechange = function(){
             if(xhr.readyState == 4){
                 if(xhr.status == 200){
-                    console.log('xhr_response',method,url,JSON.parse(xhr.response).message);
-                    if(callback!=null) callback(JSON.parse(xhr.response));
-                    if(repeat_checktype(repeat_data,'always')){
-                        setTimeout(xhr_fetch_data(method,url,form_data,xhr_timeout,callback),repeat_data.repeat_time);
+                    try{
+                        console.log('xhr_response',method,url,JSON.parse(xhr.response).message);
+                        if(callback!=null) callback(JSON.parse(xhr.response));
+                        if(repeat_checktype(repeat_data,'always')){
+                            setTimeout(xhr_fetch_data(method,url,form_data,xhr_timeout,callback),repeat_data.repeat_time);
+                        }
+                    }catch(err){
+                        alert("Error, data: "+xhr.response+"\n\n"+err.stack);
                     }
                 }else{
                     if(repeat_checktype(repeat_data,'onerror') || repeat_checktype(repeat_data,'always')){

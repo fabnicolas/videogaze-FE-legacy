@@ -1,4 +1,17 @@
-// This module inheritely runs only once.
+/* This module inheritely runs only once.
+   JSLoader is an utility class to load JS files on runtime.
+   
+   Normal usage:
+    '''
+    <script src="./js/JSLoader.js"></script>
+    <script>
+        JSLoader.setFolder("js/");          // Set folder as root of your .js files (Optional).
+        JSLoader.load_once("myscript.js", function(){
+            // myscript.js loaded
+        });
+    </script>
+    '''
+*/
 
 if(typeof(JSLoader)=='undefined'){
 

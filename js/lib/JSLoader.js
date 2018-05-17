@@ -8,7 +8,7 @@
  * 
  * Normal usage:
  *  '''
- *  <script src="./js/JSLoader.js"></script>
+ *  <script src="./js/lib/JSLoader.js"></script>
  *  <script>
  *      JSLoader.setFolder("js/");          // Set folder as root of your .js files (Optional).
  *      JSLoader.load_once("myscript.js", function(){

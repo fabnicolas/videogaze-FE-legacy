@@ -12,7 +12,7 @@ var SPA = (function(undefined){
         if(page_fragments_folder===undefined) page_fragments_folder=null;
         if(callback===undefined) callback=null;
         // Require DOMUtils 
-        JSLoader.load_once("DOMUtils.js",function(){
+        JSLoader.load_once("lib/DOMUtils.js",function(){
             if(_initialized==false){
                 _div_spajs = document.createElement("div");
                 _div_spajs.id="spa-js";

@@ -46,7 +46,7 @@
         </div>
     </header>
     <footer id="spa-app" class="vbox-bottom"></footer>
-    <script src="./js/JSLoader.js"></script>
+    <script src="./js/lib/JSLoader.js"></script>
     <script>
         window.frontend_url = (document.getElementsByTagName("base")[0]).href;
         window.backend_url = window.frontend_url+'../videogaze-BE/';
@@ -63,10 +63,10 @@
                 else                    echo "SPA.setPage('start.html');";
                 ?>
 
-                JSLoader.load("CollapseElement.js", function(){
+                JSLoader.load("lib/CollapseElement.js", function(){
                     toggle_header = CollapseElement('folding-header');
                 });
-                JSLoader.load("ImageLoader.js", function(){
+                JSLoader.load("lib/ImageLoader.js", function(){
                     ImageLoader.loadBackgroundImage("./images/dbs.webp");
                     DOMUtils.toggleClass(document.getElementById("bglayer"), "background-layer");
                 });

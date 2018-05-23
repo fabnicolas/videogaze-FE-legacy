@@ -53,7 +53,7 @@
 
         var toggle_header;
         JSLoader.setFolder("js/");
-        JSLoader.load_once("SPA.js", function(){
+        JSLoader.load_once("lib/SPA.js", function(){
             SPA.init('./page_fragments/',function(){
                 SPA.setVar('video_to_play','<?php echo ($video_source!=null)?$video_source:'sample.mp4';?>');
                 SPA.setVar('roomcode','<?php echo $roomcode;?>');

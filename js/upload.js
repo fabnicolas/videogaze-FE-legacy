@@ -210,32 +210,6 @@ var ChunkUploader = (function() {
         });
     }
 
-    
-
-    /*
-    function UploadFile(file) {
-        logger_uploadjs("triggered file upload");
-        var fd = new FormData();
-        fd.append("afile", file);
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', window.backend_url+'handle_file_upload.php', true);
-        xhr.timeout = 60000;
-        xhr.ontimeout = function() {
-            alert("Timed out!!!");
-        }
-
-        xhr.upload.onprogress = function(e) {
-            if (e.lengthComputable) {
-                logger_uploadjs("triggered onprogress");
-                var percentComplete = Math.round((e.loaded / e.total) * 100);
-                logger_uploadjs(percentComplete + '% uploaded');
-
-            }
-        };
-        xhr.send(fd);
-    }*/
-
-
     // Initialize the uploader.
     function uploader_init() {
         var fileselect = document.getElementById("fileselect");

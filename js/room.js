@@ -360,7 +360,7 @@ var Room = (function(){
     var round_time=function(value, decimals){
         return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
     }
-      
+
     /**
      * Skip events while executing a callback.
      * 
@@ -577,13 +577,14 @@ var Room = (function(){
             SPA.setVar("video_to_play",room_data.stream_key);
             var video_to_play = room_data.stream_key;
             if(room_data.stream_type=='local'){
-                VideoJSPlayer.inject_local_video_player(
+                VideoJSPlayer.inject_insite_video_player(
                     video_container_id,
                     video_player_id,
                     video_to_play,
                     '',
                     function(){
                         Room.attach_videojs_handler("my_video");
+                        if(callback!=null) callback();
                     }
                 );
             }else if(room_data.stream_type=='youtube'){
@@ -594,22 +595,42 @@ var Room = (function(){
                     '',
                     function(){
                         Room.attach_videojs_handler("my_video");
+                        if(callback!=null) callback();
                     }
                 );
             }else if(room_data.stream_type=='external_mp4'){
-                VideoJSPlayer.inject_external_mp4_video_player(
-                    video_container_id,
-                    video_player_id,
-                    video_to_play,
-                    '',
-                    function(){
-                        Room.attach_videojs_handler("my_video");
-                    }
-                );
+                console.log(SPA.getVar("blob_loaded"))
+                if(video_to_play.startsWith("blob:http") && SPA.getVar("blob_loaded")==null){
+                    JSLoader.load("lib/LocalFileSelector.js", function(){
+                        console.log(document.getElementById("video_selector"))
+                        document.getElementById("video_selector").style.display="block";
+                        LocalFileSelector.listenTo("video_selector", function(file){
+                            VideoJSPlayer.inject_external_video_player(
+                                video_container_id,
+                                video_player_id,
+                                file,
+                                '',
+                                function(){
+                                    Room.attach_videojs_handler("my_video");
+                                    if(callback!=null) callback();
+                                }
+                            );
+                        });
+                    })
+                }else{
+                    VideoJSPlayer.inject_external_video_player(
+                        video_container_id,
+                        video_player_id,
+                        video_to_play,
+                        '',
+                        function(){
+                            Room.attach_videojs_handler("my_video");
+                            if(callback!=null) callback();
+                        }
+                    );
+                }
             }
         });
-
-        if(callback!=null) callback();
     }
 
     /**

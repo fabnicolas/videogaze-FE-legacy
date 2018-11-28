@@ -30,18 +30,18 @@ var CollapseElement = function(node_name){
         var css_dynamic_animation = document.createElement('style');
         css_dynamic_animation.type = 'text/css';
         css_dynamic_animation.appendChild(document.createTextNode(
-            ".folding-div{overflow:hidden;}\n"+
-            ".folding-div.hide{animation: folding_div_hide 0.5s forwards;}\n"+
-            ".folding-div.show{animation: folding_div_show 0.5s forwards;}\n"+
+            "#"+node_name+"{overflow:hidden;}\n"+
+            "#"+node_name+".hide{animation: "+node_name+"_collapse_hide 0.5s forwards;}\n"+
+            "#"+node_name+".show{animation: "+node_name+"_collapse_show 0.5s forwards;}\n"+
             "\n"+
-            "@keyframes folding_div_hide{\n"+
-            "    0%{max-height:"+_node_start_height+"px;}\n"+
-            "    100%{max-height:0px;}\n"+
+            "@keyframes "+node_name+"_collapse_hide{\n"+
+            "    0%{margin-top:0px;}\n"+
+            "    100%{margin-top:-"+_node_start_height+"px;}\n"+
             "}\n"+
             "\n"+
-            "@keyframes folding_div_show{\n"+
-            "    0%{max-height:0px;}\n"+
-            "    100%{max-height:"+_node_start_height+"px;}\n"+
+            "@keyframes "+node_name+"_collapse_show{\n"+
+            "    0%{margin-top:-"+_node_start_height+"px;}\n"+
+            "    100%{margin-top:0px;}\n"+
             "}"
         ));
         document.getElementsByTagName("head")[0].appendChild(css_dynamic_animation);

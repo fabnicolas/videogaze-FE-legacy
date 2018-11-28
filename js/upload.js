@@ -1,16 +1,13 @@
 var textarea_logger = document.getElementById("upload-logs");
-    function logger_uploadjs(text){
-        console.log(text);
-        textarea_logger.innerHTML=textarea_logger.innerHTML+"\n"+text;
-        textarea_logger.scrollTop=textarea_logger.scrollHeight;
-    }
+function logger_uploadjs(text){
+    console.log(text);
+    textarea_logger.innerHTML=textarea_logger.innerHTML+"\n"+text;
+    textarea_logger.scrollTop=textarea_logger.scrollHeight;
+}
 
 var ChunkUploader = (function() {
     'use strict';
-    var bars = document.getElementById('bars'),
-        uploaders = [],
-        upload,
-        chooseFile;
+    var uploaders = [];
 
     var callback_finish_upload=null;
 
@@ -211,12 +208,7 @@ var ChunkUploader = (function() {
     }
 
     // Initialize the uploader.
-    function uploader_init() {
-        var fileselect = document.getElementById("fileselect");
-        var filedrag = document.getElementById("filedrag");
-        var submitbutton = document.getElementById("submitbutton");
-        var video_element = document.getElementById("video-preview");
-
+    function uploader_init(fileselect, filedrag, submitbutton, video_element) {
         // File selected.
         if(fileselect!=null){
             fileselect.addEventListener("change", eventhandler_fileselected, false);
@@ -238,6 +230,11 @@ var ChunkUploader = (function() {
 
     // If file management is allowed on the browser
     if(window.File && window.FileList && window.FileReader) {
-        uploader_init();
+        uploader_init(
+            document.getElementById("fileselect"),
+            document.getElementById("filedrag"),
+            document.getElementById("submitbutton"),
+            document.getElementById("video-preview")
+        );
     }
 })();

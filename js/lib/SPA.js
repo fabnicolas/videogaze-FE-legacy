@@ -16,7 +16,7 @@
  * Example (JSLoader):
  *  '''
  *  <header id="spa-top">My page</header>
- *  <footer id="spa-app"></footer>
+ *  <div id="spa-app"></div>
  * 
  *  <script src="./js/lib/JSLoader.js"></script>
  *  <script>

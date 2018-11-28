@@ -33,7 +33,7 @@
 <body>
     <div id="bglayer" class="vbox background-layer">
     <header id="spa-top" class="vbox-top">
-        <div id="folding-header" class="folding-div">
+        <div id="folding-header">
             <a onclick="SPA.setPage('start.html','./')" class="title"><h1>VideoGaze</h1></a>
             <a onclick="SPA.setPage('start.html')" href="#">#START</a>
             <a onclick="SPA.setPage('second.html')" href="#">#SECOND</a>
@@ -45,13 +45,13 @@
             <a onclick="toggle_header.toggle_animation()">_fold/unfold</a>
         </div>
     </header>
-    <footer id="spa-app" class="vbox-bottom"></footer>
+    <div id="spa-app" class="vbox-bottom"></div>
     <script src="./js/lib/JSLoader.js"></script>
     <script>
         window.frontend_url = (document.getElementsByTagName("base")[0]).href;
         window.backend_url = window.frontend_url+'../videogaze-BE/';
 
-        var toggle_header;
+        var toggle_header,toggle_header_and_controls;
         JSLoader.setFolder("js/");
         JSLoader.load_once("lib/SPA.js", function(){
             SPA.init('./page_fragments/',function(){
@@ -65,6 +65,7 @@
 
                 JSLoader.load("lib/CollapseElement.js", function(){
                     toggle_header = CollapseElement('folding-header');
+                    toggle_header_and_controls = CollapseElement('spa-top');
                 });
                 JSLoader.load("lib/ImageLoader.js", function(){
                     ImageLoader.loadBackgroundImage("./images/dbs.webp");
@@ -73,6 +74,12 @@
                 DOMUtils.loadCSS("./css/roboto.css");
             });
         });
+
+        document.onkeydown = function(event) {
+            event = event || window.event;
+            var keyCode = event.which || event.keyCode;
+            if(keyCode===78) toggle_header_and_controls.toggle_animation()
+        };
     </script>
     
     </div>

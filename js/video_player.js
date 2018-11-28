@@ -27,6 +27,13 @@ var VideoJSPlayer = (function(){
         }
     }
 
+    var no_js_message=function(){
+        return '\n<p class="vjs-no-js">'
+        +    '\nTo view this video please enable JavaScript, and consider upgrading to a web browser that'
+        +    '\n<a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>'
+        +  '\n</p>';
+    }
+
     var init_youtube = function(callback){
         if(callback===undefined) callback=null;
 
@@ -42,7 +49,7 @@ var VideoJSPlayer = (function(){
         }
     }
 
-    var inject_local_video_player = function(node,player_id,filename,extra_video_elements,callback){
+    var inject_insite_video_player = function(node,player_id,filename,extra_video_elements,callback){
         if(player_id===undefined) player_id='my_video';
         if(extra_video_elements===undefined) extra_video_elements='';
         if(callback===undefined) callback=null;
@@ -52,17 +59,14 @@ var VideoJSPlayer = (function(){
         +'\n data-setup="{}">'
         +'\n<source src="'+(window.backend_url)+'stream_mp4.php?filename='+filename+'"'
         +' type=\'video/mp4\'>'
-        +  '\n<p class="vjs-no-js">'
-        +    '\nTo view this video please enable JavaScript, and consider upgrading to a web browser that'
-        +    '\n<a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>'
-        +  '\n</p>'
+        +  no_js_message()
         +'\n</video>';
         node.innerHTML = body_data;
         
         if(callback!=null) callback();
     }
 
-    var inject_external_mp4_video_player = function(node,player_id,url,extra_video_elements,callback){
+    var inject_external_video_player = function(node,player_id,url,extra_video_elements,callback){
         if(player_id===undefined) player_id='my_video';
         if(extra_video_elements===undefined) extra_video_elements='';
         if(callback===undefined) callback=null;
@@ -71,10 +75,7 @@ var VideoJSPlayer = (function(){
         +'controls playsinline '+extra_video_elements+' preload="auto" data-setup="{}">'
         +'\n<source src="'+url+'"'
         +' type=\'video/mp4\'>'
-        +  '\n<p class="vjs-no-js">'
-        +    '\nTo view this video please enable JavaScript, and consider upgrading to a web browser that'
-        +    '\n<a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>'
-        +  '\n</p>'
+        +  no_js_message()
         +'\n</video>';
         node.innerHTML = body_data;
 
@@ -87,7 +88,10 @@ var VideoJSPlayer = (function(){
             if(extra_video_elements===undefined) extra_video_elements='';
             if(callback===undefined) callback=null;
 
-            var body_data = '<video id="'+player_id+'" class="video-js vjs-default-skin" controls playsinline '+extra_video_elements+' preload="auto" style="width:100%;height:100%;"></video>';
+            var body_data = '<video id="'+player_id+'" class="video-js vjs-default-skin" '+
+            'controls playsinline '+extra_video_elements+' preload="auto" '+
+            'style="width:100%;height:100%;">'+
+            '</video>';
             node.innerHTML = body_data;
 
             videojs(player_id, {    // data-setup tag
@@ -101,8 +105,8 @@ var VideoJSPlayer = (function(){
 
     return {
         init: init,
-        inject_local_video_player: inject_local_video_player,
+        inject_insite_video_player: inject_insite_video_player,
         inject_youtube_video_player: inject_youtube_video_player,
-        inject_external_mp4_video_player: inject_external_mp4_video_player
+        inject_external_video_player: inject_external_video_player
     }
 })();

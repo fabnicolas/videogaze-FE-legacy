@@ -5,22 +5,13 @@
     <h4>OR</h4>
     <br/><br/>
     Insert YouTube URL here: <input type="text" id="youtube_url" value=""/>
-    <input type="button" onclick="make_room('youtube', 'youtube_url')" value="Go!"/>
+    <input type="button" onclick="youtubeURLbutton()" value="Go!"/>
 </div>
 
 <script type="text/javascript">
-    var make_room = function(stream_type, stream_key){
-        SPA.setVar('video_to_play', document.getElementById(stream_key).value);
-        JSLoader.load("room.js",function(){
-            Room.init(null,
-                {'stream_type': stream_type, 'stream_key': SPA.getVar('video_to_play')},
-                function(response){
-                    if(response.status==1){
-                        SPA.setVar('roomcode',response.message.roomcode);
-                        SPA.setPage("room.html");
-                    }
-                }
-            );
-        });
+    JSLoader.load("room_maker.js");
+
+    var youtubeURLbutton=function(){
+        return make_room(null, 'youtube', document.getElementById('youtube_url').value)
     }
 </script>

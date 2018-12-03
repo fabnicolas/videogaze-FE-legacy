@@ -31,8 +31,12 @@ var CollapseElement = function(node_name){
         css_dynamic_animation.type = 'text/css';
         css_dynamic_animation.appendChild(document.createTextNode(
             "#"+node_name+"{overflow:hidden;}\n"+
-            "#"+node_name+".hide{animation: "+node_name+"_collapse_hide 0.5s forwards;}\n"+
-            "#"+node_name+".show{animation: "+node_name+"_collapse_show 0.5s forwards;}\n"+
+            "#"+node_name+".hide{"+
+                "animation: "+node_name+"_collapse_hide 0.5s forwards;"+
+            "}\n"+
+            "#"+node_name+".show{"+
+                "animation: "+node_name+"_collapse_show 0.5s forwards;"+
+            "}\n"+
             "\n"+
             "@keyframes "+node_name+"_collapse_hide{\n"+
             "    0%{margin-top:0px;}\n"+
@@ -47,9 +51,6 @@ var CollapseElement = function(node_name){
         document.getElementsByTagName("head")[0].appendChild(css_dynamic_animation);
     }
 
-    /**
-     * Start animation (On/Off is not needed).
-     */
     var toggle_animation=function(){
         var is_show_there=_node_element.className.indexOf("show")!=-1;
         var is_hide_there=_node_element.className.indexOf("hide")!=-1;
@@ -64,6 +65,20 @@ var CollapseElement = function(node_name){
         }
     }
 
+    var start_animation=function(){
+        var is_show_there=_node_element.className.indexOf("show")!=-1;
+        var is_hide_there=_node_element.className.indexOf("hide")!=-1;
+        if(is_hide_there) DOMUtils.toggleClass(_node_element,"hide");
+        if(!is_show_there) DOMUtils.toggleClass(_node_element,"show");
+    }
+
+    var stop_animation=function(){
+        var is_show_there=_node_element.className.indexOf("show")!=-1;
+        var is_hide_there=_node_element.className.indexOf("hide")!=-1;
+        if(is_show_there) DOMUtils.toggleClass(_node_element,"show");
+        if(!is_hide_there) DOMUtils.toggleClass(_node_element,"hide");
+    }
+
     /** If constructor has node_name defined, auto-invoke init and install_animation. */
     if(node_name!==undefined){
         init(node_name);
@@ -74,6 +89,8 @@ var CollapseElement = function(node_name){
     return{
         init: init,
         install_animation: install_animation,
-        toggle_animation: toggle_animation
+        toggle_animation: toggle_animation,
+        start_animation: start_animation,
+        stop_animation: stop_animation
     }
 }

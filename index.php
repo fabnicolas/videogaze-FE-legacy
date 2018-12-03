@@ -38,11 +38,12 @@
             <a onclick="SPA.setPage('start.html')" href="#">#START</a>
             <a onclick="SPA.setPage('second.html')" href="#">#SECOND</a>
             <a onclick="SPA.setPage('lorem.html')" href="#">#LOREM_IPSUM</a>
+            <a onclick="SPA.setPage('login.html')" href="#">#LOGIN</a>
         </div>
         <div id="custom-controls">
-            Controls: 
+            Controlli/Controls: 
             <span id="custom-controls-extra"></span>
-            <a onclick="toggle_header.toggle_animation()">_fold/unfold</a>
+            <a id="fold_control">_hide</a>
         </div>
     </header>
     <div id="spa-app" class="vbox-bottom"></div>
@@ -66,6 +67,23 @@
                 JSLoader.load("lib/CollapseElement.js", function(){
                     toggle_header = CollapseElement('folding-header');
                     toggle_header_and_controls = CollapseElement('spa-top');
+
+                    var controls_attached=false;
+                    var fold_control = document.getElementById('fold_control');
+                    var div_header = document.getElementById('spa-top');
+                    fold_control.onclick=function(){
+                        if(!controls_attached){
+                            handler_mouseenter=function(){toggle_header.start_animation();};
+                            handler_mouseleave=function(){toggle_header.stop_animation();};
+                            toggle_header.toggle_animation();
+                        }else{
+                            handler_mouseenter=null;
+                            handler_mouseleave=null;
+                        }
+                        div_header.onmouseenter=handler_mouseenter;
+                        div_header.onmouseleave=handler_mouseleave;
+                        controls_attached=!controls_attached;
+                    };
                 });
                 JSLoader.load("lib/ImageLoader.js", function(){
                     ImageLoader.loadBackgroundImage("./images/dbs.webp");
